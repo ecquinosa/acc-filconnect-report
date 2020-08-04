@@ -1,0 +1,153 @@
+
+{
+  "header": {
+    "reportVersion": 1,
+    "event": "Allocation failed - JavaScript heap out of memory",
+    "trigger": "FatalError",
+    "filename": "report.20200804.221408.56436.0.001.json",
+    "dumpEventTime": "2020-08-04T22:14:08Z",
+    "dumpEventTimeStamp": "1596550448797",
+    "processId": 56436,
+    "cwd": "D:\\WORK\\Projects\\acc-filconnect-report",
+    "commandLine": [
+      "node",
+      "D:\\WORK\\Projects\\acc-filconnect-report\\node_modules\\.bin\\\\..\\ts-node\\dist\\bin.js",
+      "src/app.ts"
+    ],
+    "nodejsVersion": "v13.7.0",
+    "wordSize": 64,
+    "arch": "x64",
+    "platform": "win32",
+    "componentVersions": {
+      "node": "13.7.0",
+      "v8": "7.9.317.25-node.28",
+      "uv": "1.34.1",
+      "zlib": "1.2.11",
+      "brotli": "1.0.7",
+      "ares": "1.15.0",
+      "modules": "79",
+      "nghttp2": "1.40.0",
+      "napi": "5",
+      "llhttp": "2.0.1",
+      "openssl": "1.1.1d",
+      "cldr": "36.0",
+      "icu": "65.1",
+      "tz": "2019c",
+      "unicode": "12.1"
+    },
+    "release": {
+      "name": "node",
+      "headersUrl": "https://nodejs.org/download/release/v13.7.0/node-v13.7.0-headers.tar.gz",
+      "sourceUrl": "https://nodejs.org/download/release/v13.7.0/node-v13.7.0.tar.gz",
+      "libUrl": "https://nodejs.org/download/release/v13.7.0/win-x64/node.lib"
+    },
+    "osName": "Windows_NT",
+    "osRelease": "10.0.19041",
+    "osVersion": "Windows 10 Home",
+    "osMachine": "x86_64",
+    "cpus": [
+      {
+        "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
+        "speed": 2096,
+        "user": 1438671,
+        "nice": 0,
+        "sys": 1464156,
+        "idle": 12618234,
+        "irq": 293625
+      },
+      {
+        "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
+        "speed": 2096,
+        "user": 4240421,
+        "nice": 0,
+        "sys": 1208359,
+        "idle": 10072140,
+        "irq": 51671
+      },
+      {
+        "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
+        "speed": 2096,
+        "user": 4729453,
+        "nice": 0,
+        "sys": 1149453,
+        "idle": 9642015,
+        "irq": 11875
+      },
+      {
+        "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
+        "speed": 2096,
+        "user": 1544734,
+        "nice": 0,
+        "sys": 744187,
+        "idle": 13232000,
+        "irq": 8656
+      },
+      {
+        "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
+        "speed": 2096,
+        "user": 3271906,
+        "nice": 0,
+        "sys": 1046984,
+        "idle": 11202031,
+        "irq": 12734
+      },
+      {
+        "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
+        "speed": 2096,
+        "user": 1275046,
+        "nice": 0,
+        "sys": 595156,
+        "idle": 13650718,
+        "irq": 10406
+      },
+      {
+        "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
+        "speed": 2096,
+        "user": 2334234,
+        "nice": 0,
+        "sys": 864328,
+        "idle": 12322359,
+        "irq": 12796
+      },
+      {
+        "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
+        "speed": 2096,
+        "user": 1941593,
+        "nice": 0,
+        "sys": 1261703,
+        "idle": 12317609,
+        "irq": 27406
+      }
+    ],
+    "networkInterfaces": [
+      {
+        "name": "Ethernet 2",
+        "internal": false,
+        "mac": "00:ff:81:46:c2:14",
+        "address": "fe80::85c0:98f:7a25:9241",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 13
+      },
+      {
+        "name": "Ethernet 2",
+        "internal": false,
+        "mac": "00:ff:81:46:c2:14",
+        "address": "10.242.2.3",
+        "netmask": "255.255.255.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "Wi-Fi",
+        "internal": false,
+        "mac": "80:91:33:c9:3e:63",
+        "address": "fe80::84f4:41c3:cd6a:1079",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 9
+      },
+      {
+        "name": "Wi-Fi",
+        "internal": false,
+        "mac": "80:91:33:c9:3e:63",
+        "address": "192.168.1.15
