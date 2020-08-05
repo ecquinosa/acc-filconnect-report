@@ -4,10 +4,10 @@
     "reportVersion": 1,
     "event": "Allocation failed - JavaScript heap out of memory",
     "trigger": "FatalError",
-    "filename": "report.20200804.221408.56436.0.001.json",
-    "dumpEventTime": "2020-08-04T22:14:08Z",
-    "dumpEventTimeStamp": "1596550448797",
-    "processId": 56436,
+    "filename": "report.20200805.184540.97236.0.001.json",
+    "dumpEventTime": "2020-08-05T18:45:40Z",
+    "dumpEventTimeStamp": "1596624340486",
+    "processId": 97236,
     "cwd": "D:\\WORK\\Projects\\acc-filconnect-report",
     "commandLine": [
       "node",
@@ -49,74 +49,74 @@
       {
         "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
         "speed": 2096,
-        "user": 1438671,
+        "user": 4664156,
         "nice": 0,
-        "sys": 1464156,
-        "idle": 12618234,
-        "irq": 293625
+        "sys": 4804500,
+        "idle": 49323828,
+        "irq": 887843
       },
       {
         "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
         "speed": 2096,
-        "user": 4240421,
+        "user": 7433515,
         "nice": 0,
-        "sys": 1208359,
-        "idle": 10072140,
-        "irq": 51671
+        "sys": 2828718,
+        "idle": 48530125,
+        "irq": 126328
       },
       {
         "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
         "speed": 2096,
-        "user": 4729453,
+        "user": 9650625,
         "nice": 0,
-        "sys": 1149453,
-        "idle": 9642015,
-        "irq": 11875
+        "sys": 3493218,
+        "idle": 45648515,
+        "irq": 44703
       },
       {
         "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
         "speed": 2096,
-        "user": 1544734,
+        "user": 5259062,
         "nice": 0,
-        "sys": 744187,
-        "idle": 13232000,
-        "irq": 8656
+        "sys": 3010296,
+        "idle": 50523000,
+        "irq": 35359
       },
       {
         "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
         "speed": 2096,
-        "user": 3271906,
+        "user": 7364234,
         "nice": 0,
-        "sys": 1046984,
-        "idle": 11202031,
-        "irq": 12734
+        "sys": 3196531,
+        "idle": 48231593,
+        "irq": 42484
       },
       {
         "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
         "speed": 2096,
-        "user": 1275046,
+        "user": 4054468,
         "nice": 0,
-        "sys": 595156,
-        "idle": 13650718,
-        "irq": 10406
+        "sys": 2175343,
+        "idle": 52562546,
+        "irq": 36015
       },
       {
         "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
         "speed": 2096,
-        "user": 2334234,
+        "user": 5785546,
         "nice": 0,
-        "sys": 864328,
-        "idle": 12322359,
-        "irq": 12796
+        "sys": 2885281,
+        "idle": 50121515,
+        "irq": 44859
       },
       {
         "model": "AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx  ",
         "speed": 2096,
-        "user": 1941593,
+        "user": 6210140,
         "nice": 0,
-        "sys": 1261703,
-        "idle": 12317609,
-        "irq": 27406
+        "sys": 4250796,
+        "idle": 48331406,
+        "irq": 91156
       }
     ],
     "networkInterfaces": [
@@ -133,7 +133,7 @@
         "name": "Ethernet 2",
         "internal": false,
         "mac": "00:ff:81:46:c2:14",
-        "address": "10.242.2.3",
+        "address": "10.242.2.2",
         "netmask": "255.255.255.0",
         "family": "IPv4"
       },
@@ -150,4 +150,4 @@
         "name": "Wi-Fi",
         "internal": false,
         "mac": "80:91:33:c9:3e:63",
-        "address": "192.168.1.15
+        "address": "192.16
