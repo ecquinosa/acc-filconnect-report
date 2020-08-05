@@ -7,14 +7,14 @@ import { RESPONSE_CODE, STATUS } from "../helpers/Constants";
 import { IResult, utilResponsePayloadSuccess, utilResponsePayloadNoData, utilResponsePayloadInvalidParameter, utilResponsePayloadSystemError, utilResponsePayloadSuccessNoParam, randomIntFromInterval } from "../helpers/Utility";
 
 export interface IExcelService {
-  SaveToXls(entity): Promise<IResult>;
+  SaveToXls(entity, totalRecords): Promise<IResult>;
 }
 
 // Service layer where to put all the business logic computation % etc.
 @Service()
 export default class ExcelService implements IExcelService {
 
-  public async SaveToXls(entity: any): Promise<IResult> {  
+  public async SaveToXls(entity: any, totalRecords: number): Promise<IResult> {  
     let result: IResult = null;
 
     try {
@@ -51,34 +51,43 @@ export default class ExcelService implements IExcelService {
 
       //console.log(entity);
 
-      await entity.forEach(r => {
-        worksheet.addRow({          
-          institutionId: r.institutionId,
-          lastName: r.lastName,
-          firstName: r.firstName,
-          middleName: r.middleName,
-          suffix: r.suffix,
-          gender: r.gender,          
-          civilStatus: r.civilStatus,
-          birthDate: r.birthDate,                    
-          birthCity: r.birthCity,          
-          birthProvince: r.birthProvince,
-          noOfChildren: r.noOfChildren,          
-          employmentStatus: r.employmentStatus,
-          isRegisteredVoter: r.isRegisteredVoter,
-          isPwd: r.isPwd,
-          isDependent: r.isDependent,
-          presentRoomFloorUnitBldg: r.presentRoomFloorUnitBldg,
-          presentHouseLotBlock: r.presentHouseLotBlock,
-          presentStreetname: r.presentStreetname,
-          presentSubdivision: r.presentSubdivision,          
-          presentBarangay: r.presentBarangay,          
-          presentCity: r.presentCity,          
-          presentProvince: r.presentProvince,
-          presentPostal: r.presentPostal,          
-          presentDistrict: r.presentDistrict
-        }).commit();
-      });      
+      var totalPage = Math.ceil(totalRecords/10000);
+      //console.log(totalPage);
+
+      for (let i = 0; i < totalPage; i++) {
+        var b = await this.breakEntity(i, 10000, entity);
+
+        await b.forEach(r => {
+          worksheet.addRow({          
+            institutionId: r.institutionId,
+            lastName: r.lastName,
+            firstName: r.firstName,
+            middleName: r.middleName,
+            suffix: r.suffix,
+            gender: r.gender,          
+            civilStatus: r.civilStatus,
+            birthDate: r.birthDate,                    
+            birthCity: r.birthCity,          
+            birthProvince: r.birthProvince,
+            noOfChildren: r.noOfChildren,          
+            employmentStatus: r.employmentStatus,
+            isRegisteredVoter: r.isRegisteredVoter,
+            isPwd: r.isPwd,
+            isDependent: r.isDependent,
+            presentRoomFloorUnitBldg: r.presentRoomFloorUnitBldg,
+            presentHouseLotBlock: r.presentHouseLotBlock,
+            presentStreetname: r.presentStreetname,
+            presentSubdivision: r.presentSubdivision,          
+            presentBarangay: r.presentBarangay,          
+            presentCity: r.presentCity,          
+            presentProvince: r.presentProvince,
+            presentPostal: r.presentPostal,          
+            presentDistrict: r.presentDistrict
+          }).commit();
+        });     
+      }
+
+       
 
       const fileName = './SearchCitizen' +  randomIntFromInterval(1000,2000).toString() + '.xlsx';
       
@@ -91,6 +100,11 @@ export default class ExcelService implements IExcelService {
     }
 
     return result;
+  }
+
+  public async breakEntity(pageNumber, pageSize, entity) {
+    const initialPos = pageNumber * pageSize;
+    return entity.slice(initialPos, initialPos + pageSize);
   }
 
 }

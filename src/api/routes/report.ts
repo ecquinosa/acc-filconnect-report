@@ -47,5 +47,19 @@ export default (app: Router) => {
     //logger.info(result);
     return res.json({ response: result }).status(200);
   });
+
+  route.post(ROUTE.REPORT.GET_FILE, async (req: Request, res: Response, next: NextFunction) => {
+    const entity = JSON.parse(JSON.stringify(req.body));
+
+    const result = await kycService.getFile(entity);
+    
+    // const result = await camundService.Start(
+    //   JSON.stringify(req.body),
+    //   JSON.stringify(req.headers),
+    //   ORCHESTRATION.PROCESS_DEFINITION.REPORT.KYC_SEARCH_CITIZEN
+    // );
+    
+    return res.json({ response: result }).status(200);
+  });
  
 };

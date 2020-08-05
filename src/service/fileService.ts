@@ -106,7 +106,8 @@ export default class fileService implements IFileService {
       var s3File = entity.location.substring(entity.location.lastIndexOf('/') + 1);
       //console.log(s3File);
 
-      var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: s3File };
+      //var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: s3File };
+      var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}` };      
 
       var s3obj = await s3.getObject(params).promise();
       //console.log(s3obj);
@@ -118,6 +119,53 @@ export default class fileService implements IFileService {
     }
     catch (error) {
       LoggerInstance.error("🔥 getFile error: %o", error);
+      //return await "Failed to get file";
+      return await utilResponsePayloadSystemError(error);
+    }
+  }
+
+  public async deleteFile(entity): Promise<IResult> {
+    try {
+      const _cloudCOnfig: client.Config = Container.get(SERVICE.CLOUD_CONFIG);
+      const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
+
+      var s3File = entity.location.substring(entity.location.lastIndexOf('/') + 1);
+      
+      var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}` };      
+
+    //   var deleteParam = {
+    //     Bucket: 'bucket-name',
+    //     Delete: {
+    //         Objects: [
+    //             {Key: 'a.txt'},
+    //             {Key: 'b.txt'},
+    //             {Key: 'c.txt'}
+    //         ]
+    //     }
+    // }; 
+
+    var files = {
+        Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}`
+    }
+
+      var deleteParam = {
+        Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET),
+        Delete: {
+            Objects: [
+                {Key: 'a.txt'},
+                {Key: 'b.txt'},
+                {Key: 'c.txt'}
+            ]
+        }
+    }; 
+      
+      s3.deleteObject(params, function(err, data) {
+        if (err) return utilResponsePayloadSystemError(err.stack); //console.log(err, err.stack); // an error occurred
+        else return utilResponsePayloadSuccess("Files deleted", 0, 0); // successful response
+      });      
+    }
+    catch (error) {
+      LoggerInstance.error("🔥 deleteFile error: %o", error);
       //return await "Failed to get file";
       return await utilResponsePayloadSystemError(error);
     }
@@ -158,5 +206,7 @@ export default class fileService implements IFileService {
       return await utilResponsePayloadSystemError(error);
     }
   }
+
+  
 
 }

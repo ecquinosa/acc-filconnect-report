@@ -14,6 +14,7 @@ export default async function () {
   camundaService = Container.get(SERVICE.CAMUNDA_SERVICE);
   kycService = Container.get(SERVICE.KYC);
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.KYC_SEARCH_CITIZEN, await kycSearchCitizen); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.GET_FILE, await getFile); 
 }
 
 async function kycSearchCitizen({ task, taskService }) {
@@ -36,6 +37,34 @@ async function kycSearchCitizen({ task, taskService }) {
   } catch (error) {
     resultService = utilResponsePayloadSystemError(error);
     log.info("🔥 kycSearchCitizen failed result : %o", JSON.stringify(resultService.value));
+    setTypedVariable(variables, resultService.value);
+  }  
+
+  variables.set("status", resultService.status);
+
+  taskService.complete(task, variables);
+}
+
+async function getFile({ task, taskService }) {
+
+  const variables = new Variables();    
+  let resultService: IResult = null;
+
+  try {
+    const taskVariables = await camundaService.GetVariables(task);
+
+    // get payload and response value.
+    const payload = taskVariables.payloadVariable.payload;
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
+    //const entity = JSON.parse(task.variables.get("payload"));
+
+    resultService = await kycService.getFile(payload);
+
+    //log.info("🔥 getMemberWithMissingImages success result : %o", JSON.stringify(responsePayload));
+    setTypedVariable(variables, resultService.value);    
+  } catch (error) {
+    resultService = utilResponsePayloadSystemError(error);
+    log.info("🔥 getFile failed result : %o", JSON.stringify(resultService.value));
     setTypedVariable(variables, resultService.value);
   }  
 

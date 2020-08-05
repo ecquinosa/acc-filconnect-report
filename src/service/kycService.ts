@@ -13,6 +13,7 @@ import fs from 'fs';
 
 export interface IKycService {
   SearchCitizen(payload): Promise<IResult>;
+  getFile(payload): Promise<IResult>;
 }
 
 // Service layer where to put all the business logic computation % etc.
@@ -168,22 +169,26 @@ export default class KycService implements IKycService {
     var repoResponse = await searchCitizenRepository.query(query);
 
     if (repoResponse.length > 0) {
+      console.log(repoResponse.length);
       const es = new ExcelService();
-      const saveToXls = await es.SaveToXls(repoResponse);
+      const saveToXls = await es.SaveToXls(repoResponse, repoResponse.length);
       if (saveToXls.status == "success") {
         const fs = new fileService();
-        //console.log(saveToXls.value.response);
+        
         var fsResult = await fs.uploadFile({"fileName": saveToXls.value.response});
 
-        return await fsResult;
-        //return await saveToXls;
+        return await fsResult;        
       }
-      else {
-        //console.log("failed");
+      else {        
         result = utilResponsePayloadNoData();
       }
 
       return result;
     }
+  }
+
+  public async getFile(entity) {
+    const fs = new fileService();
+    return await fs.getFile({"location": entity.payload.fileName});    
   }
 }

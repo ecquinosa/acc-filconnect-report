@@ -22,7 +22,7 @@ import { camundaInstance } from "./Camunda";
     // Service injection and instantiate
     Container.set(SERVICE.CAMUNDA_SERVICE, new CamundaService());
     Container.set(SERVICE.KYC, new KycService());
-    Container.set(SERVICE.REPORT, new KycService());
+    Container.set(SERVICE.REPORT, new KycService());    
 
     // Inject camunda to access anywhere of the project
     Container.set(SERVICE.CAMUNDA, camundaInstance());
