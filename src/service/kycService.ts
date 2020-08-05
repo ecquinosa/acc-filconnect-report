@@ -169,7 +169,7 @@ export default class KycService implements IKycService {
     var repoResponse = await searchCitizenRepository.query(query);
 
     if (repoResponse.length > 0) {
-      console.log(repoResponse.length);
+      //console.log(repoResponse.length);
       const es = new ExcelService();
       const saveToXls = await es.SaveToXls(repoResponse, repoResponse.length);
       if (saveToXls.status == "success") {
