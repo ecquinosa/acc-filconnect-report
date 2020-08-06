@@ -103,6 +103,7 @@ export default class fileService implements IFileService {
       const _cloudCOnfig: client.Config = Container.get(SERVICE.CLOUD_CONFIG);
       const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
 
+      var ext = entity.location.substring(entity.location.lastIndexOf('.') + 1);
       var s3File = entity.location.substring(entity.location.lastIndexOf('/') + 1);
       //console.log(s3File);
 
@@ -114,8 +115,13 @@ export default class fileService implements IFileService {
 
       let buff = await Buffer.from(s3obj.Body);
       let base64 = await buff.toString('base64');
+
+      var response = {
+        ext: ext,
+        base64: base64
+      }
       
-      return await utilResponsePayloadSuccess(base64, 0, 0);
+      return await utilResponsePayloadSuccess(response, 0, 0);
     }
     catch (error) {
       LoggerInstance.error("🔥 getFile error: %o", error);
