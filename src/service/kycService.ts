@@ -34,10 +34,10 @@ export default class KycService implements IKycService {
     var bdateFromByage = "1900-01-01";
     var bdateToByage = dateFormat(now, "yyyy-mm-dd");
 
-    if (payload.payload.ageFrom != undefined && payload.payload.ageFrom != 0) {
+    if (payload.ageFrom != undefined && payload.ageFrom != 0) {
       bdateToByage = dateFormat(
         new Date(
-          now.getFullYear() - payload.payload.ageFrom,
+          now.getFullYear() - payload.ageFrom,
           now.getMonth(),
           now.getDate()
         ),
@@ -45,21 +45,21 @@ export default class KycService implements IKycService {
       );
     }
 
-    if (payload.payload.ageTo != undefined && payload.payload.ageTo != 0) {
+    if (payload.ageTo != undefined && payload.ageTo != 0) {
       bdateFromByage = dateFormat(
-        new Date(now.getFullYear() - payload.payload.ageTo, 1, 1),
+        new Date(now.getFullYear() - payload.ageTo, 1, 1),
         "yyyy-mm-dd"
       );
     }
 
     if (
-      payload.payload.birthDateFrom != "" &&
-      payload.payload.birthDateFrom != undefined &&
-      payload.payload.birthDateTo != "" &&
-      payload.payload.birthDateTo != undefined
+      payload.birthDateFrom != "" &&
+      payload.birthDateFrom != undefined &&
+      payload.birthDateTo != "" &&
+      payload.birthDateTo != undefined
     ) {
-      bdateFrom = payload.payload.birthDateFrom;
-      bdateTo = payload.payload.birthDateTo;
+      bdateFrom = payload.birthDateFrom;
+      bdateTo = payload.birthDateTo;
     }
 
     var query = "SELECT memberId, userProfileId, institutionId, lastName, firstName, middleName, suffix, gender, \
@@ -69,93 +69,93 @@ export default class KycService implements IKycService {
     presentCityId, presentCity, presentProvinceId,presentProvince,presentPostal,presentDistrictId, \
     presentDistrict FROM KycSearchCitizen Where 1=1"
 
-    if (payload.payload.institutionId != "" && payload.payload.institutionId != undefined) {
-      query = query.concat(" AND institutionId like '%", payload.payload.institutionId, "%' ");
+    if (payload.institutionId != "" && payload.institutionId != undefined) {
+      query = query.concat(" AND institutionId like '%", payload.institutionId, "%' ");
     }
 
-    if (payload.payload.userProfileId != "" && payload.payload.userProfileId != undefined) {
-      query = query.concat(" AND userProfileId like '%", payload.payload.userProfileId, "%' ");
+    if (payload.userProfileId != "" && payload.userProfileId != undefined) {
+      query = query.concat(" AND userProfileId like '%", payload.userProfileId, "%' ");
     }
 
-    if (payload.payload.firstName != "" && payload.payload.firstName != undefined) {
-      query = query.concat(" AND firstName like '%", payload.payload.firstName, "%' ");
+    if (payload.firstName != "" && payload.firstName != undefined) {
+      query = query.concat(" AND firstName like '%", payload.firstName, "%' ");
     }
 
-    if (payload.payload.lastName != "" && payload.payload.lastName != undefined) {
-      query = query.concat(" AND lastName like '%", payload.payload.lastName, "%' ");
+    if (payload.lastName != "" && payload.lastName != undefined) {
+      query = query.concat(" AND lastName like '%", payload.lastName, "%' ");
     }
 
-    if (payload.payload.middleName != "" && payload.payload.middleName != undefined) {
-      query = query.concat(" AND middleName like '%", payload.payload.middleName, "%' ");
+    if (payload.middleName != "" && payload.middleName != undefined) {
+      query = query.concat(" AND middleName like '%", payload.middleName, "%' ");
     }
 
-    if (payload.payload.civilStatus != "" && payload.payload.civilStatus != undefined) {
-      query = query.concat(" AND civilStatus like '%", payload.payload.civilStatus, "%' ");
+    if (payload.civilStatus != "" && payload.civilStatus != undefined) {
+      query = query.concat(" AND civilStatus like '%", payload.civilStatus, "%' ");
     }
 
-    if (payload.payload.gender != "" && payload.payload.gender != undefined) {
-      query = query.concat(" AND gender like '%", payload.payload.gender, "%' ");
+    if (payload.gender != "" && payload.gender != undefined) {
+      query = query.concat(" AND gender like '%", payload.gender, "%' ");
     }
 
-    if (payload.payload.isPwd != "" && payload.payload.isPwd != undefined) {
-      query = query.concat(" AND isPwd = '", payload.payload.isPwd, "' ");
+    if (payload.isPwd != "" && payload.isPwd != undefined) {
+      query = query.concat(" AND isPwd = '", payload.isPwd, "' ");
     }
 
-    if (payload.payload.isDependent != "" && payload.payload.isDependent != undefined) {
-      query = query.concat(" AND isDependent ='", payload.payload.isDependent, "' ");
+    if (payload.isDependent != "" && payload.isDependent != undefined) {
+      query = query.concat(" AND isDependent ='", payload.isDependent, "' ");
     }
 
-    if (payload.payload.birthCity != "" && payload.payload.birthCity != undefined) {
-      query = query.concat(" AND birthCity like '%", payload.payload.birthCity, "%' ");
+    if (payload.birthCity != "" && payload.birthCity != undefined) {
+      query = query.concat(" AND birthCity like '%", payload.birthCity, "%' ");
     }
 
-    if (payload.payload.birthProvince != "" && payload.payload.birthProvince != undefined) {
-      query = query.concat(" AND birthProvince like '%", payload.payload.birthProvince, "%' ");
+    if (payload.birthProvince != "" && payload.birthProvince != undefined) {
+      query = query.concat(" AND birthProvince like '%", payload.birthProvince, "%' ");
     }
 
-    if (payload.payload.employmentStatus != "" && payload.payload.employmentStatus != undefined) {
-      query = query.concat(" AND employmentStatus like '%", payload.payload.employmentStatus, "%' ");
+    if (payload.employmentStatus != "" && payload.employmentStatus != undefined) {
+      query = query.concat(" AND employmentStatus like '%", payload.employmentStatus, "%' ");
     }
 
-    if (payload.payload.presentRoomFloorUnitBldg != "" && payload.payload.presentRoomFloorUnitBldg != undefined) {
-      query = query.concat(" AND presentRoomFloorUnitBldg like '%", payload.payload.presentRoomFloorUnitBldg, "%' ");
+    if (payload.presentRoomFloorUnitBldg != "" && payload.presentRoomFloorUnitBldg != undefined) {
+      query = query.concat(" AND presentRoomFloorUnitBldg like '%", payload.presentRoomFloorUnitBldg, "%' ");
     }
 
-    if (payload.payload.presentHouseLotBlock != "" && payload.payload.presentHouseLotBlock != undefined) {
-      query = query.concat(" AND presentHouseLotBlock like '%", payload.payload.presentHouseLotBlock, "%' ");
+    if (payload.presentHouseLotBlock != "" && payload.presentHouseLotBlock != undefined) {
+      query = query.concat(" AND presentHouseLotBlock like '%", payload.presentHouseLotBlock, "%' ");
     }
 
-    if (payload.payload.presentStreetname != "" && payload.payload.presentStreetname != undefined) {
-      query = query.concat(" AND presentStreetname like '%", payload.payload.presentStreetname, "%' ");
+    if (payload.presentStreetname != "" && payload.presentStreetname != undefined) {
+      query = query.concat(" AND presentStreetname like '%", payload.presentStreetname, "%' ");
     }
 
-    if (payload.payload.presentSubdivision != "" && payload.payload.presentSubdivision != undefined) {
-      query = query.concat(" AND presentSubdivision like '%", payload.payload.presentSubdivision, "%' ");
+    if (payload.presentSubdivision != "" && payload.presentSubdivision != undefined) {
+      query = query.concat(" AND presentSubdivision like '%", payload.presentSubdivision, "%' ");
     }
 
-    if (payload.payload.presentBarangay != "" && payload.payload.presentBarangay != undefined) {
-      query = query.concat(" AND presentBarangay like '%", payload.payload.presentBarangay, "%' ");
+    if (payload.presentBarangay != "" && payload.presentBarangay != undefined) {
+      query = query.concat(" AND presentBarangay like '%", payload.presentBarangay, "%' ");
     }
 
-    if (payload.payload.presentCity != "" && payload.payload.presentCity != undefined) {
-      query = query.concat(" AND presentCity like '%", payload.payload.presentCity, "%' ");
+    if (payload.presentCity != "" && payload.presentCity != undefined) {
+      query = query.concat(" AND presentCity like '%", payload.presentCity, "%' ");
     }
 
-    if (payload.payload.presentProvince != "" && payload.payload.presentProvince != undefined) {
-      query = query.concat(" AND presentProvince like '%", payload.payload.presentProvince, "%' ");
+    if (payload.presentProvince != "" && payload.presentProvince != undefined) {
+      query = query.concat(" AND presentProvince like '%", payload.presentProvince, "%' ");
     }
 
     if (
-      payload.payload.birthDateFrom != "" &&
-      payload.payload.birthDateFrom != undefined &&
-      payload.payload.birthDateTo != "" &&
-      payload.payload.birthDateTo != undefined
+      payload.birthDateFrom != "" &&
+      payload.birthDateFrom != undefined &&
+      payload.birthDateTo != "" &&
+      payload.birthDateTo != undefined
     ) {
-      query = query.concat(" AND (birthDay >='", dateFormat(payload.payload.birthDateFrom, "mmddhhMM").toString().slice(0, 4), "'  AND birthDay <='", dateFormat(payload.payload.birthDateTo, "mmddhhMM").toString().slice(0, 4), "') ");
+      query = query.concat(" AND (birthDay >='", dateFormat(payload.birthDateFrom, "mmddhhMM").toString().slice(0, 4), "'  AND birthDay <='", dateFormat(payload.birthDateTo, "mmddhhMM").toString().slice(0, 4), "') ");
 
     }
 
-    if (payload.payload.ageTo != undefined && payload.payload.ageTo != 0) {
+    if (payload.ageTo != undefined && payload.ageTo != 0) {
       query = query.concat(" AND (birthDate BETWEEN '", bdateFromByage, "'  AND '", bdateToByage, "') ");
     }
 
@@ -186,8 +186,10 @@ export default class KycService implements IKycService {
     }
   }
 
-  public async getFile(entity) {
+  public async getFile(payload) {    
     const fs = new fileService();
-    return await fs.getFile({"location": entity.payload.fileName});    
+    var response = await fs.getFile({"location": payload.fileName});
+    //console.log(response);
+    return await response;    
   }
 }
