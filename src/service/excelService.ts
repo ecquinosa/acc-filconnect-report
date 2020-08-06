@@ -2,7 +2,7 @@ import { Service, Container } from "typedi";
 import { validate, ValidationError } from "class-validator";
 import { getConnection } from "typeorm"; // to get the configure db connection.
 import { KycSearchCitizen } from "../entity/kycSearchCitizen";
-import { exampleCreateResponseVM } from "../viewmodel/example/exampleCreateResponseVM";
+//import { exampleCreateResponseVM } from "../viewmodel/example/exampleCreateResponseVM";
 import { RESPONSE_CODE, STATUS } from "../helpers/Constants";
 import { IResult, utilResponsePayloadSuccess, utilResponsePayloadNoData, utilResponsePayloadInvalidParameter, utilResponsePayloadSystemError, utilResponsePayloadSuccessNoParam, randomIntFromInterval } from "../helpers/Utility";
 
