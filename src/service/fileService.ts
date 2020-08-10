@@ -111,7 +111,15 @@ export default class fileService implements IFileService {
       var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}` };      
 
       var s3obj = await s3.getObject(params).promise();
-      //console.log(s3obj);
+      
+    //   s3.getObject(params, function(err, res) {
+    //     if (err === null) {
+    //        res.attachment('file.ext'); // or whatever your logic needs
+    //        res.send(data.Body);
+    //     } else {
+    //        res.status(500).send(err);
+    //     }
+    // });
 
       let buff = await Buffer.from(s3obj.Body);
       let base64 = await buff.toString('base64');
@@ -128,7 +136,47 @@ export default class fileService implements IFileService {
       //return await "Failed to get file";
       return await utilResponsePayloadSystemError(error);
     }
-  }
+  }  
+
+  // public async getFile2(entity) {
+  //   try {
+  //     const _cloudCOnfig: client.Config = Container.get(SERVICE.CLOUD_CONFIG);
+  //     const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
+
+  //     var ext = entity.location.substring(entity.location.lastIndexOf('.') + 1);
+  //     var s3File = entity.location.substring(entity.location.lastIndexOf('/') + 1);
+      
+  //     var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}` };      
+
+  //     var fileStream = fs.createWriteStream(s3File);
+  //     var s3Stream = s3.getObject(params).createReadStream();
+
+  //     // Listen for errors returned by the service
+  //     s3Stream.on('error', function (err) {
+  //       // NoSuchKey: The specified key does not exist
+  //       LoggerInstance.error("🔥 NoSuchKey: The specified key does not exist. error: %o", err);        
+  //       return utilResponsePayloadSystemError("NoSuchKey: The specified key does not exist");
+  //     });
+
+  //     var base64data = null;
+
+  //     s3Stream.pipe(fileStream).on('error', function (err) {
+  //       // capture any errors that occur when writing data to the file        
+  //       LoggerInstance.error("🔥 File stream error: %o", err);
+  //       return utilResponsePayloadSystemError("File stream error");
+  //     }).on('close', async function () {
+  //       var bitmap = await fs.readFileSync(s3File);
+  //       base64data = await new Buffer(bitmap).toString('base64');
+
+  //       return await utilResponsePayloadSuccess(base64data, 0, 0);
+  //     });
+  //   }
+  //   catch (error) {
+  //     LoggerInstance.error("🔥 error: %o", error);
+  //     return await utilResponsePayloadSystemError(error);
+  //   }
+  // }
+
 
   public async deleteFile(entity): Promise<IResult> {
     try {
@@ -177,41 +225,7 @@ export default class fileService implements IFileService {
     }
   }
 
-  public async getFile2(entity) {
-    try {
-      const _cloudCOnfig: client.Config = Container.get(SERVICE.CLOUD_CONFIG);
-      const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
-
-      var s3File = entity.location.substring(entity.location.lastIndexOf('/') + 1);
-
-      var fileStream = fs.createWriteStream(s3File);
-      var s3Stream = s3.getObject({ Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: s3File }).createReadStream();
-
-      // Listen for errors returned by the service
-      s3Stream.on('error', function (err) {
-        // NoSuchKey: The specified key does not exist
-        LoggerInstance.error("🔥 NoSuchKey: The specified key does not exist. error: %o", err);        
-        return utilResponsePayloadSystemError("NoSuchKey: The specified key does not exist");
-      });
-
-      var base64data = null;
-
-      s3Stream.pipe(fileStream).on('error', function (err) {
-        // capture any errors that occur when writing data to the file        
-        LoggerInstance.error("🔥 File stream error: %o", err);
-        return utilResponsePayloadSystemError("File stream error");
-      }).on('close', async function () {
-        var bitmap = await fs.readFileSync(s3File);
-        base64data = await new Buffer(bitmap).toString('base64');
-
-        return await utilResponsePayloadSuccess(base64data, 0, 0);
-      });
-    }
-    catch (error) {
-      LoggerInstance.error("🔥 error: %o", error);
-      return await utilResponsePayloadSystemError(error);
-    }
-  }
+  
 
   
 
