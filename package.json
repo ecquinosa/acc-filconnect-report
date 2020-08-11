@@ -30,6 +30,7 @@
     "jwt-decode": "^2.2.0",
     "mssql": "^6.2.0",
     "mysql": "^2.18.1",
+    "pdfkit": "^0.11.0",
     "typedi": "^0.8.0",
     "typeorm": "^0.2.24",
     "winston": "^3.2.1"

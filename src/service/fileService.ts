@@ -10,6 +10,7 @@ import { IResult, utilResponsePayloadSystemError, utilResponsePayloadSuccess } f
 export interface IFileService {
   uploadFileFromBase64(entity): Promise<IResult>;
   uploadFile(entity): Promise<IResult>;
+  uploadFilePdf(entity): Promise<IResult>;
   getFile(entity): Promise<IResult>;
 }
 
@@ -68,6 +69,9 @@ export default class fileService implements IFileService {
       var outputFile = entity.fileName;
       var s3File = outputFile.substring(outputFile.lastIndexOf('/') + 1);            
 
+      console.log(outputFile);
+      console.log(s3File);
+
       const fileContent = fs.readFileSync(outputFile);
 
       // Setting up S3 upload parameters
@@ -88,7 +92,48 @@ export default class fileService implements IFileService {
       }).promise();
 
       //delete created file
-      fs.unlink(outputFile, (err) => { if (err) { LoggerInstance.error("🔥 file deletion error: %o", err); } })
+      //fs.unlink(outputFile, (err) => { if (err) { LoggerInstance.error("🔥 file deletion error: %o", err); } })
+
+      return await utilResponsePayloadSuccess((await awsUpload).Location, 0, 0);
+    }
+    catch (error) {
+      LoggerInstance.error("🔥 uploadFile error: %o", error);
+      return await utilResponsePayloadSystemError(error);
+    }
+  }
+
+  public async uploadFilePdf(entity): Promise<IResult> {
+    try {
+      const _cloudCOnfig: client.Config = Container.get(SERVICE.CLOUD_CONFIG);
+      const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
+
+      var outputFile = entity.fileName;
+      var s3File = outputFile.substring(outputFile.lastIndexOf('/') + 1);            
+
+      console.log(outputFile);
+      console.log(s3File);
+
+      const fileContent = fs.readFileSync(outputFile);
+
+      // Setting up S3 upload parameters
+      const params = {
+        Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET),
+        Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}`,
+        Body: fileContent,
+        ContentEncoding: 'base64',
+        ContentType: 'application/pdf'
+      };
+
+      //Uploading files to the bucket     
+      var awsUpload = s3.upload(params, function (err, data) {
+        if (err) {
+          LoggerInstance.error("🔥 error: %o", err);
+          return utilResponsePayloadSystemError("Failed to upload");
+        }
+      }).promise();
+
+      //delete created file
+      //fs.unlink(outputFile, (err) => { if (err) { LoggerInstance.error("🔥 file deletion error: %o", err); } })
 
       return await utilResponsePayloadSuccess((await awsUpload).Location, 0, 0);
     }

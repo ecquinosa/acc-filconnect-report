@@ -20,13 +20,13 @@ export default (app: Router) => {
   route.post(ROUTE.REPORT.KYC_SEARCH_CITIZEN, async (req: Request, res: Response, next: NextFunction) => {
     const entity = JSON.parse(JSON.stringify(req.body));
 
-    //const result = await kycService.SearchCitizen(entity.payload);
+    const result = await kycService.SearchCitizen(entity.payload);
     
-    const result = await camundService.Start(
-      JSON.stringify(req.body),
-      JSON.stringify(req.headers),
-      ORCHESTRATION.PROCESS_DEFINITION.REPORT.KYC_SEARCH_CITIZEN
-    );    
+    // const result = await camundService.Start(
+    //   JSON.stringify(req.body),
+    //   JSON.stringify(req.headers),
+    //   ORCHESTRATION.PROCESS_DEFINITION.REPORT.KYC_SEARCH_CITIZEN
+    // );    
 
     logger.info(result);
     return res.json({ response: result }).status(200);

@@ -4,8 +4,9 @@ import { getConnection } from "typeorm"; // to get the configure db connection.
 import { KycSearchCitizen } from "../entity/kycSearchCitizen";
 import { RESPONSE_CODE, STATUS } from "../helpers/Constants";
 import { paginationVM } from "../viewmodel/base/baseVM";
-import { IResult, utilResponsePayloadSuccess, utilResponsePayloadNoData, utilResponsePayloadInvalidParameter, utilResponsePayloadSystemError } from "../helpers/Utility";
+import { IResult, utilResponsePayloadSuccess, utilResponsePayloadNoData, utilResponsePayloadInvalidParameter, utilResponsePayloadSystemError, utilResponsePayloadSuccessNoParam } from "../helpers/Utility";
 import ExcelService, { IExcelService } from "./excelService";
+import PDFService, { IPDFService } from "./pdfService";
 import fileService from "./fileService";
 
 import fs from 'fs';
@@ -167,29 +168,92 @@ export default class KycService implements IKycService {
 
     var repoResponse = await searchCitizenRepository.query(query);
 
+
+
     if (repoResponse.length > 0) {
-      //console.log(repoResponse.length);
+
+      var outputFiles = {
+        xlsx: "",
+        pdf: "",
+      };
+
       const es = new ExcelService();
       const saveToXls = await es.SaveToXls(repoResponse, repoResponse.length);
       if (saveToXls.status == "success") {
         const fs = new fileService();
-        
-        var fsResult = await fs.uploadFile({"fileName": saveToXls.value.response});
 
-        return await fsResult;        
+        var fsResult = await fs.uploadFile({ "fileName": saveToXls.value.response });
+
+        //return await fsResult;
+
+        if (fsResult.status == "success") {
+          outputFiles.xlsx = fsResult.value.response.toString();
+        }
       }
-      else {        
-        result = utilResponsePayloadNoData();
+      // else {
+      //   result = utilResponsePayloadNoData();
+      // }
+
+      const ps = new PDFService();
+      const saveToPdf = await ps.SaveToPdf(repoResponse, repoResponse.length);
+      if (saveToPdf.status == "success") {
+        const fs = new fileService();
+
+        var fsResult = await fs.uploadFilePdf({ "fileName": saveToPdf.value.response });
+
+        if (fsResult.status == "success") {
+          outputFiles.pdf = fsResult.value.response.toString();
+        }
+
+        //return await utilResponsePayloadSuccessNoParam();
       }
+      // else {
+      //   result = utilResponsePayloadNoData();
+      // }
+
+      if (outputFiles.xlsx != "") result = utilResponsePayloadSuccess(outputFiles, 0, 0);
+      else if (outputFiles.pdf != "") result = utilResponsePayloadSuccess(outputFiles, 0, 0);
+      else result = utilResponsePayloadSystemError("Failed to generate xlsx or pdf");
+
+      // if(payload.reportType == "xlsx")
+      // {
+      //   //console.log(repoResponse.length);
+      //   const es = new ExcelService();
+      //   const saveToXls = await es.SaveToXls(repoResponse, repoResponse.length);
+      //   if (saveToXls.status == "success") {
+      //     const fs = new fileService();
+
+      //     var fsResult = await fs.uploadFile({ "fileName": saveToXls.value.response });
+
+      //     return await fsResult;
+      //   }
+      //   else {
+      //     result = utilResponsePayloadNoData();
+      //   }
+      // }else if(payload.reportType == "pdf")
+      // {
+      //   const ps = new PDFService();
+      //   const saveToPdf = await ps.SaveToPdf(repoResponse, repoResponse.length);
+      //   if (saveToPdf.status == "success") {
+      //     const fs = new fileService();
+
+      //     var fsResult = await fs.uploadFile({"fileName": saveToPdf.value.response});
+
+      //     return await utilResponsePayloadSuccessNoParam();        
+      //   }
+      //   else {        
+      //     result = utilResponsePayloadNoData();
+      //   }
+      // }
 
       return result;
     }
   }
 
-  public async getFile(payload) {    
+  public async getFile(payload) {
     const fs = new fileService();
-    var response = await fs.getFile({"location": payload.fileName});
+    var response = await fs.getFile({ "location": payload.fileName });
     //console.log(response);
-    return await response;    
+    return await response;
   }
 }
