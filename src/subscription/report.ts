@@ -4,7 +4,7 @@ import { SERVICE, ORCHESTRATION, RESPONSE_CODE, STATUS } from "../helpers/Consta
 import log from "../loaders/Logger";
 import { IKycService } from "../service/kycService";
 import { ICamundaService } from "../service/CamundaService";
-import { IResult, utilResponsePayloadSystemError } from "../helpers/Utility";
+import { IResult, utilResponsePayloadSystemError, utilResponsePayloadSuccess, utilResponsePayloadSuccessNoParam } from "../helpers/Utility";
 
 let camundaService: ICamundaService;
 let kycService: IKycService;
@@ -15,6 +15,7 @@ export default async function () {
   kycService = Container.get(SERVICE.KYC);
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.KYC_SEARCH_CITIZEN, await kycSearchCitizen); 
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.GET_FILE, await getFile); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
 }
 
 async function kycSearchCitizen({ task, taskService }) {
@@ -60,12 +61,39 @@ async function getFile({ task, taskService }) {
 
     //console.log(payload.payload);
     resultService = await kycService.getFile(payload);
-    log.info(JSON.stringify(resultService.value));
-    log.info(JSON.stringify(resultService.value.response));
+    // log.info(JSON.stringify(resultService.value));
+    // log.info(JSON.stringify(resultService.value.response));
     setTypedVariable(variables, resultService.value);    
   } catch (error) {
     resultService = utilResponsePayloadSystemError(error);
     log.info("🔥 getFile failed result : %o", JSON.stringify(resultService.value));
+    setTypedVariable(variables, resultService.value);
+  }  
+
+  variables.set("status", resultService.status);
+
+  taskService.complete(task, variables);
+}
+
+async function deleteFile({ task, taskService }) {
+
+  const variables = new Variables();    
+  let resultService: IResult = null;
+
+  try {
+    const taskVariables = await camundaService.GetVariables(task);
+
+    // get payload and response value.
+    const payload = taskVariables.payloadVariable.payload;
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;    
+
+    resultService = await kycService.deleteFile(payload);
+
+    setTypedVariable(variables, resultService.value);    
+  } catch (error) {
+    //console.log(error);
+    resultService = utilResponsePayloadSystemError(error);
+    log.info("🔥 deleteFile failed result : %o", JSON.stringify(resultService.value));
     setTypedVariable(variables, resultService.value);
   }  
 

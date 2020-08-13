@@ -8,15 +8,17 @@ import { IResult, utilResponsePayloadSuccess, utilResponsePayloadNoData, utilRes
 import fs, { fsyncSync } from 'fs';
 import { bool } from "aws-sdk/clients/signer";
 
+import fileService from "./fileService";
+
 export interface IPDFService {
-  SaveToPdf(entity, totalRecords): Promise<IResult>;
+  SaveToPdf(entity, totalRecords, isSaveToS3): Promise<IResult>;
 }
 
 // Service layer where to put all the business logic computation % etc.
 @Service()
 export default class PDFService implements IPDFService {
 
-  public async SaveToPdf(entity: any, totalRecords: number): Promise<IResult> {
+  public async SaveToPdf(entity: any, totalRecords: number, isSaveToS3: bool): Promise<IResult> {
     let result: IResult = null;
 
     try {
@@ -24,7 +26,9 @@ export default class PDFService implements IPDFService {
 
       const PDFDocument = require('pdfkit');
 
-      var doc = new PDFDocument({ layout: 'landscape' });      
+      var doc = new PDFDocument({ layout: 'landscape' });
+
+      doc.pipe(fs.createWriteStream(fileName));
 
       console.log("total : " + totalRecords.toString());
 
@@ -45,35 +49,35 @@ export default class PDFService implements IPDFService {
         var b = await this.breakEntity(i, recordBreaker, entity);
 
         //header
-        this.textInRow(doc, "#", x, y-10, 15);
+        this.textInRow(doc, "#", x, y - 10, 15);
         x += 15;
-        this.textInRow(doc, "institutionId", x, y-10, 100);
+        this.textInRow(doc, "institutionId", x, y - 10, 100);
         x += 100;
-        this.textInRow(doc, "lastName", x, y-10, 60);
+        this.textInRow(doc, "lastName", x, y - 10, 60);
         x += 60;
-        this.textInRow(doc, "firstName", x, y-10, 60);
+        this.textInRow(doc, "firstName", x, y - 10, 60);
         x += 60;
-        this.textInRow(doc, "middleName", x, y-10, 60);
+        this.textInRow(doc, "middleName", x, y - 10, 60);
         x += 60;
-        this.textInRow(doc, "suffix", x, y-10, 35);
+        this.textInRow(doc, "suffix", x, y - 10, 35);
         x += 35;
-        this.textInRow(doc, "gender", x, y-10, 30);
+        this.textInRow(doc, "gender", x, y - 10, 30);
         x += 30;
-        this.textInRow(doc, "birth date", x, y-10, 40);
+        this.textInRow(doc, "birth date", x, y - 10, 40);
         x += 40;
-        this.textInRow(doc, "civilStatus", x, y-10, 45);
+        this.textInRow(doc, "civilStatus", x, y - 10, 45);
         x += 45;
-        this.textInRow(doc, "employmentStatus", x, y-10, 75);
+        this.textInRow(doc, "employmentStatus", x, y - 10, 75);
         x += 75;
-        this.textInRow(doc, "presentBarangay", x, y-10, 60);
+        this.textInRow(doc, "presentBarangay", x, y - 10, 60);
         x += 60;
-        this.textInRow(doc, "presentCity", x, y-10, 60);
+        this.textInRow(doc, "presentCity", x, y - 10, 60);
         x += 60;
-        this.textInRow(doc, "presentProvince", x, y-10, 60);
+        this.textInRow(doc, "presentProvince", x, y - 10, 60);
         x += 60;
-        this.textInRow(doc, "presentDistrict", x, y-10, 60);
+        this.textInRow(doc, "presentDistrict", x, y - 10, 60);
 
-        x = xBase;        
+        x = xBase;
 
         await b.forEach(r => {
           var dob = new Date(r.birthDate);
@@ -120,9 +124,13 @@ export default class PDFService implements IPDFService {
 
       doc.end();
 
-      doc.pipe(fs.createWriteStream(fileName));
+      if (isSaveToS3) {
+        const fs2 = new fileService();
 
-      result = utilResponsePayloadSuccess(fileName, 0, 0);
+        //var fsResult = await fs.uploadFilePdf({ "fileName": saveToPdf.value.response });
+        result = await fs2.uploadFilePdf({ "fileName": fileName, "doc": doc });
+      }
+      else result = utilResponsePayloadSuccess(fileName, 0, 0);
     }
     catch (error) {
       result = utilResponsePayloadSystemError(error);

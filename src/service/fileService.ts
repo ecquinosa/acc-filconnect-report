@@ -67,10 +67,10 @@ export default class fileService implements IFileService {
       const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
 
       var outputFile = entity.fileName;
-      var s3File = outputFile.substring(outputFile.lastIndexOf('/') + 1);            
+      var s3File = outputFile.substring(outputFile.lastIndexOf('/') + 1);
 
-      console.log(outputFile);
-      console.log(s3File);
+      // console.log(outputFile);
+      // console.log(s3File);
 
       const fileContent = fs.readFileSync(outputFile);
 
@@ -92,7 +92,7 @@ export default class fileService implements IFileService {
       }).promise();
 
       //delete created file
-      //fs.unlink(outputFile, (err) => { if (err) { LoggerInstance.error("🔥 file deletion error: %o", err); } })
+      fs.unlink(outputFile, (err) => { if (err) { LoggerInstance.error("🔥 file deletion error: %o", err); } })
 
       return await utilResponsePayloadSuccess((await awsUpload).Location, 0, 0);
     }
@@ -102,16 +102,20 @@ export default class fileService implements IFileService {
     }
   }
 
+
   public async uploadFilePdf(entity): Promise<IResult> {
     try {
       const _cloudCOnfig: client.Config = Container.get(SERVICE.CLOUD_CONFIG);
       const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
 
       var outputFile = entity.fileName;
-      var s3File = outputFile.substring(outputFile.lastIndexOf('/') + 1);            
+      var s3File = outputFile.substring(outputFile.lastIndexOf('/') + 1);
 
-      console.log(outputFile);
-      console.log(s3File);
+      // console.log(outputFile);
+      // console.log(s3File);
+
+      const PDFDocument = require('pdfkit');
+      var doc = entity.doc;
 
       const fileContent = fs.readFileSync(outputFile);
 
@@ -119,8 +123,8 @@ export default class fileService implements IFileService {
       const params = {
         Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET),
         Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}`,
-        Body: fileContent,
-        ContentEncoding: 'base64',
+        Body: doc,
+        //ContentEncoding: 'base64',
         ContentType: 'application/pdf'
       };
 
@@ -133,7 +137,7 @@ export default class fileService implements IFileService {
       }).promise();
 
       //delete created file
-      //fs.unlink(outputFile, (err) => { if (err) { LoggerInstance.error("🔥 file deletion error: %o", err); } })
+      fs.unlink(outputFile, (err) => { if (err) { LoggerInstance.error("🔥 file deletion error: %o", err); } })
 
       return await utilResponsePayloadSuccess((await awsUpload).Location, 0, 0);
     }
@@ -153,18 +157,18 @@ export default class fileService implements IFileService {
       //console.log(s3File);
 
       //var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: s3File };
-      var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}` };      
+      var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}` };
 
       var s3obj = await s3.getObject(params).promise();
-      
-    //   s3.getObject(params, function(err, res) {
-    //     if (err === null) {
-    //        res.attachment('file.ext'); // or whatever your logic needs
-    //        res.send(data.Body);
-    //     } else {
-    //        res.status(500).send(err);
-    //     }
-    // });
+
+      //   s3.getObject(params, function(err, res) {
+      //     if (err === null) {
+      //        res.attachment('file.ext'); // or whatever your logic needs
+      //        res.send(data.Body);
+      //     } else {
+      //        res.status(500).send(err);
+      //     }
+      // });
 
       let buff = await Buffer.from(s3obj.Body);
       let base64 = await buff.toString('base64');
@@ -173,7 +177,7 @@ export default class fileService implements IFileService {
         ext: ext,
         base64: base64
       }
-      
+
       return await utilResponsePayloadSuccess(response, 0, 0);
     }
     catch (error) {
@@ -181,7 +185,7 @@ export default class fileService implements IFileService {
       //return await "Failed to get file";
       return await utilResponsePayloadSystemError(error);
     }
-  }  
+  }
 
   // public async getFile2(entity) {
   //   try {
@@ -190,7 +194,7 @@ export default class fileService implements IFileService {
 
   //     var ext = entity.location.substring(entity.location.lastIndexOf('.') + 1);
   //     var s3File = entity.location.substring(entity.location.lastIndexOf('/') + 1);
-      
+
   //     var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}` };      
 
   //     var fileStream = fs.createWriteStream(s3File);
@@ -228,50 +232,36 @@ export default class fileService implements IFileService {
       const _cloudCOnfig: client.Config = Container.get(SERVICE.CLOUD_CONFIG);
       const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
 
-      var s3File = entity.location.substring(entity.location.lastIndexOf('/') + 1);
-      
-      var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}` };      
-
-    //   var deleteParam = {
-    //     Bucket: 'bucket-name',
-    //     Delete: {
-    //         Objects: [
-    //             {Key: 'a.txt'},
-    //             {Key: 'b.txt'},
-    //             {Key: 'c.txt'}
-    //         ]
-    //     }
-    // }; 
-
-    var files = {
-        Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}`
-    }
+      var files = [];
+      for (var f in entity.files) {
+        var s3File = entity.files[f].key.substring(entity.files[f].key.lastIndexOf('/') + 1);        
+        files.push({ Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}` });       
+      }    
 
       var deleteParam = {
         Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET),
         Delete: {
-            Objects: [
-                {Key: 'a.txt'},
-                {Key: 'b.txt'},
-                {Key: 'c.txt'}
-            ]
+          Objects: files
         }
-    }; 
-      
-      s3.deleteObject(params, function(err, data) {
-        if (err) return utilResponsePayloadSystemError(err.stack); //console.log(err, err.stack); // an error occurred
-        else return utilResponsePayloadSuccess("Files deleted", 0, 0); // successful response
-      });      
+      };   
+
+      var s = await s3.deleteObjects(deleteParam,  function (err, data) {
+            if (err) utilResponsePayloadSystemError(err);  // error
+            else return utilResponsePayloadSuccess("Files deleted", 0, 0);                 // deleted
+          }).promise();
+
+      //return utilResponsePayloadSuccess("Files deleted", 0, 0);
     }
     catch (error) {
-      LoggerInstance.error("🔥 deleteFile error: %o", error);
+      //console.log(error);
+      //LoggerInstance.error("🔥 deleteFile error: %o", error);
       //return await "Failed to get file";
       return await utilResponsePayloadSystemError(error);
     }
   }
 
-  
 
-  
+
+
 
 }

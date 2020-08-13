@@ -12,6 +12,7 @@ export const ROUTE = {
     MAIN: "/report",
     KYC_SEARCH_CITIZEN: "/kycSearchCitizen",
     GET_FILE: "/getFile",
+    DELETE_FILE: "/deleteFile",
   },
 };
 
@@ -19,13 +20,15 @@ export const ORCHESTRATION = {
   TOPIC: {
     REPORT: {
       KYC_SEARCH_CITIZEN: "reportKycSearchCitizen",
-      GET_FILE: "reportGetFile"
+      GET_FILE: "reportGetFile",
+      DELETE_FILE: "reportDeleteFile"
     },
   },
   PROCESS_DEFINITION: {
     REPORT: {
       KYC_SEARCH_CITIZEN: "reportKycSearchCitizen",
-      GET_FILE: "reportGetFile"
+      GET_FILE: "reportGetFile",
+      DELETE_FILE: "reportDeleteFile"
     },
   },
   VARIABLE: {

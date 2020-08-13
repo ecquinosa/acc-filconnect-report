@@ -14,6 +14,7 @@ import fs from 'fs';
 export interface IKycService {
   SearchCitizen(payload): Promise<IResult>;
   getFile(payload): Promise<IResult>;
+  deleteFile(payload): Promise<IResult>;
 }
 
 // Service layer where to put all the business logic computation % etc.
@@ -168,83 +169,32 @@ export default class KycService implements IKycService {
 
     var repoResponse = await searchCitizenRepository.query(query);
 
-
-
     if (repoResponse.length > 0) {
 
-      var outputFiles = {
-        xlsx: "",
-        pdf: "",
-      };
+      var xlsx = payload.outputFile.find(({ ext }) => ext === "xlsx");
+      var pdf = payload.outputFile.find(({ ext }) => ext === "pdf");           
 
-      const es = new ExcelService();
-      const saveToXls = await es.SaveToXls(repoResponse, repoResponse.length);
-      if (saveToXls.status == "success") {
-        const fs = new fileService();
+      var files = [];     
 
-        var fsResult = await fs.uploadFile({ "fileName": saveToXls.value.response });
+      if (xlsx !=null) {
+        const es = new ExcelService();
+        const saveToXls = await es.SaveToXls(repoResponse, repoResponse.length);
+        if (saveToXls.status == "success") {
+          const fs = new fileService();
 
-        //return await fsResult;
-
-        if (fsResult.status == "success") {
-          outputFiles.xlsx = fsResult.value.response.toString();
+          var fsResult = await fs.uploadFile({ "fileName": saveToXls.value.response });
+          if (fsResult.status == "success") files.push({ ext: fsResult.value.response.toString() });
         }
       }
-      // else {
-      //   result = utilResponsePayloadNoData();
-      // }
 
-      const ps = new PDFService();
-      const saveToPdf = await ps.SaveToPdf(repoResponse, repoResponse.length);
-      if (saveToPdf.status == "success") {
-        const fs = new fileService();
-
-        var fsResult = await fs.uploadFilePdf({ "fileName": saveToPdf.value.response });
-
-        if (fsResult.status == "success") {
-          outputFiles.pdf = fsResult.value.response.toString();
-        }
-
-        //return await utilResponsePayloadSuccessNoParam();
+      if (pdf != null) {
+        const ps = new PDFService();
+        const saveToPdf = await ps.SaveToPdf(repoResponse, repoResponse.length, true);
+        if (saveToPdf.status == "success") files.push({ ext: saveToPdf.value.response.toString() });     
       }
-      // else {
-      //   result = utilResponsePayloadNoData();
-      // }
 
-      if (outputFiles.xlsx != "") result = utilResponsePayloadSuccess(outputFiles, 0, 0);
-      else if (outputFiles.pdf != "") result = utilResponsePayloadSuccess(outputFiles, 0, 0);
-      else result = utilResponsePayloadSystemError("Failed to generate xlsx or pdf");
-
-      // if(payload.reportType == "xlsx")
-      // {
-      //   //console.log(repoResponse.length);
-      //   const es = new ExcelService();
-      //   const saveToXls = await es.SaveToXls(repoResponse, repoResponse.length);
-      //   if (saveToXls.status == "success") {
-      //     const fs = new fileService();
-
-      //     var fsResult = await fs.uploadFile({ "fileName": saveToXls.value.response });
-
-      //     return await fsResult;
-      //   }
-      //   else {
-      //     result = utilResponsePayloadNoData();
-      //   }
-      // }else if(payload.reportType == "pdf")
-      // {
-      //   const ps = new PDFService();
-      //   const saveToPdf = await ps.SaveToPdf(repoResponse, repoResponse.length);
-      //   if (saveToPdf.status == "success") {
-      //     const fs = new fileService();
-
-      //     var fsResult = await fs.uploadFile({"fileName": saveToPdf.value.response});
-
-      //     return await utilResponsePayloadSuccessNoParam();        
-      //   }
-      //   else {        
-      //     result = utilResponsePayloadNoData();
-      //   }
-      // }
+      if (files.length > 0) result = utilResponsePayloadSuccess(files, 0, 0);
+      else result = utilResponsePayloadSystemError("No xlsx or pdf generated");     
 
       return result;
     }
@@ -254,6 +204,12 @@ export default class KycService implements IKycService {
     const fs = new fileService();
     var response = await fs.getFile({ "location": payload.fileName });
     //console.log(response);
+    return await response;
+  }
+
+  public async deleteFile(payload) {
+    const fs = new fileService();
+    var response = await fs.deleteFile(payload);    
     return await response;
   }
 }

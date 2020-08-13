@@ -23,7 +23,7 @@ export default async ({ expressApp, cloudConfig }) => {
   //await dependencyInjection(cloudConfig);
   Logger.info("✌️ Dependency Injection");
 
-  //await eureka();
+  await eureka();
   Logger.info("✌️ Service Registry");
 
   // load express configuration
