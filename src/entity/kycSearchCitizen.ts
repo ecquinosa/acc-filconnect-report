@@ -100,11 +100,13 @@ export class KycSearchCitizen extends Base {
   @Column({
     default: "00000000-0000-0000-0000-000000000000",
     type: "uniqueidentifier",
+    nullable: true,
   })
   employmentStatusId: string;
 
   @Column({
     length: 50,
+    nullable: true,
   })
   employmentStatus: string;
 
@@ -125,32 +127,38 @@ export class KycSearchCitizen extends Base {
 
   @Column({
     length: 50,
+    nullable: true,
   })
   presentRoomFloorUnitBldg: string;
 
   @Column({
     length: 50,
+    nullable: true,
   })
   presentHouseLotBlock: string;
 
   @Column({
     length: 50,
+    nullable: true,
   })
   presentStreetname: string;
 
   @Column({
     length: 50,
+    nullable: true,
   })
   presentSubdivision: string;
 
   @Column({
     default: "00000000-0000-0000-0000-000000000000",
     type: "uniqueidentifier",
+    nullable: true,
   })
   presentBarangayId: string;
 
   @Column({
     length: 50,
+    nullable: true,
   })
   presentBarangay: string;
 
@@ -192,5 +200,23 @@ export class KycSearchCitizen extends Base {
     nullable: true
   })
   presentDistrict: string;
+
+  @Column({
+    length: 20,
+    nullable: true,
+  })
+  telephoneNos: string;
+
+  @Column({
+    length: 20,
+    nullable: true,
+  })
+  mobileNos: string;
+
+  @Column({
+    length: 50,
+    nullable: true,
+  })
+  email: string;
 
 }

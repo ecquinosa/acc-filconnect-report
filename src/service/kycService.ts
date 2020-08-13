@@ -69,7 +69,7 @@ export default class KycService implements IKycService {
     employmentStatusId, employmentStatus, isRegisteredVoter, isPwd, isDependent, presentRoomFloorUnitBldg, \
     presentHouseLotBlock, presentStreetname, presentSubdivision, presentBarangayId, presentBarangay, \
     presentCityId, presentCity, presentProvinceId,presentProvince,presentPostal,presentDistrictId, \
-    presentDistrict, '' as mobileNos, '' as telephoneNos, '' as email FROM KycSearchCitizen Where 1=1"
+    presentDistrict, mobileNos, telephoneNos, email FROM KycSearchCitizen Where 1=1"
 
     if (payload.institutionId != "" && payload.institutionId != undefined) {
       query = query.concat(" AND institutionId like '%", payload.institutionId, "%' ");
