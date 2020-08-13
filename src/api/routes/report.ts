@@ -4,6 +4,7 @@ import { ICamundaService } from "../../service/CamundaService";
 import logger from "../../loaders/Logger";
 import { ROUTE, SERVICE, ORCHESTRATION, RESPONSE_CODE } from "../../helpers/Constants";
 import { IKycService } from "../../service/kycService";
+import fileService from "../../service/fileService";
 
 const route = Router();
 
@@ -57,6 +58,23 @@ export default (app: Router) => {
       JSON.stringify(req.headers),
       ORCHESTRATION.PROCESS_DEFINITION.REPORT.DELETE_FILE
     );
+    
+    logger.info(result);
+    return res.json({ response: result }).status(200);
+  });
+
+  route.post(ROUTE.REPORT.LIST_FILE, async (req: Request, res: Response, next: NextFunction) => {
+    const entity = JSON.parse(JSON.stringify(req.body));
+
+    const fs = new fileService();
+
+    const result = await fs.tempDeleteBayambangData(entity.payload);
+    
+    // const result = await camundService.Start(
+    //   JSON.stringify(req.body),
+    //   JSON.stringify(req.headers),
+    //   ORCHESTRATION.PROCESS_DEFINITION.REPORT.LIST_FILE
+    // );
     
     logger.info(result);
     return res.json({ response: result }).status(200);

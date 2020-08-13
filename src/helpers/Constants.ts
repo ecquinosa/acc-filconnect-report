@@ -13,6 +13,7 @@ export const ROUTE = {
     KYC_SEARCH_CITIZEN: "/kycSearchCitizen",
     GET_FILE: "/getFile",
     DELETE_FILE: "/deleteFile",
+    LIST_FILE: "/listFiles",
   },
 };
 
@@ -21,14 +22,16 @@ export const ORCHESTRATION = {
     REPORT: {
       KYC_SEARCH_CITIZEN: "reportKycSearchCitizen",
       GET_FILE: "reportGetFile",
-      DELETE_FILE: "reportDeleteFile"
+      DELETE_FILE: "reportDeleteFile",
+      LIST_FILE: "reportListFiles",
     },
   },
   PROCESS_DEFINITION: {
     REPORT: {
       KYC_SEARCH_CITIZEN: "reportKycSearchCitizen",
       GET_FILE: "reportGetFile",
-      DELETE_FILE: "reportDeleteFile"
+      DELETE_FILE: "reportDeleteFile",
+      LIST_FILE: "reportListFiles"
     },
   },
   VARIABLE: {

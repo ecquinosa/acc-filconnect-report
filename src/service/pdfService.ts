@@ -30,7 +30,7 @@ export default class PDFService implements IPDFService {
 
       doc.pipe(fs.createWriteStream(fileName));
 
-      console.log("total : " + totalRecords.toString());
+      //console.log("total : " + totalRecords.toString());
 
       var recordBreaker = 47;
       var totalPage = Math.ceil(totalRecords / recordBreaker);
@@ -45,37 +45,28 @@ export default class PDFService implements IPDFService {
 
       var recordCntr = 1;
 
+      let columnParams = [];
+      columnParams[0] = ["FIRST NAME", 0, 60];
+      columnParams[1] = ["MIDDLE NAME", 1, 60];
+      columnParams[2] = ["LAST NAME", 2, 60];
+      columnParams[3] = ["SUFFIX", 3, 40];
+      columnParams[4] = ["BIRTHDATE", 4, 40];
+      columnParams[5] = ["GENDER", 5, 30];
+      columnParams[6] = ["CIVIL STATUS", 6, 45];
+      columnParams[7] = ["BARANGAY", 7, 60];
+      columnParams[8] = ["STREETNAME", 8, 60];
+      columnParams[9] = ["MOBILE NOS.", 9, 60];
+      columnParams[10] = ["TELEPHONE NOS.", 10, 60];
+      columnParams[11] = ["EMAIL", 11, 60];
+
       for (let i = 0; i < totalPage; i++) {
         var b = await this.breakEntity(i, recordBreaker, entity);
 
-        //header
-        this.textInRow(doc, "#", x, y - 10, 15);
-        x += 15;
-        this.textInRow(doc, "institutionId", x, y - 10, 100);
-        x += 100;
-        this.textInRow(doc, "lastName", x, y - 10, 60);
-        x += 60;
-        this.textInRow(doc, "firstName", x, y - 10, 60);
-        x += 60;
-        this.textInRow(doc, "middleName", x, y - 10, 60);
-        x += 60;
-        this.textInRow(doc, "suffix", x, y - 10, 35);
-        x += 35;
-        this.textInRow(doc, "gender", x, y - 10, 30);
-        x += 30;
-        this.textInRow(doc, "birth date", x, y - 10, 40);
-        x += 40;
-        this.textInRow(doc, "civilStatus", x, y - 10, 45);
-        x += 45;
-        this.textInRow(doc, "employmentStatus", x, y - 10, 75);
-        x += 75;
-        this.textInRow(doc, "presentBarangay", x, y - 10, 60);
-        x += 60;
-        this.textInRow(doc, "presentCity", x, y - 10, 60);
-        x += 60;
-        this.textInRow(doc, "presentProvince", x, y - 10, 60);
-        x += 60;
-        this.textInRow(doc, "presentDistrict", x, y - 10, 60);
+        //headers
+        for (var c in columnParams) {
+          this.textInRow(doc, columnParams[c][0], x, y - 10, columnParams[c][2], true);
+          x += columnParams[c][2];
+        }
 
         x = xBase;
 
@@ -83,33 +74,13 @@ export default class PDFService implements IPDFService {
           var dob = new Date(r.birthDate);
           dob.setHours(0, 0, 0, 0);
 
-          this.textInRow(doc, recordCntr.toString(), x, y, 15);
-          x += 15;
-          this.textInRow(doc, r.institutionId, x, y, 100);
-          x += 100;
-          this.textInRow(doc, r.lastName, x, y, 60);
-          x += 60;
-          this.textInRow(doc, r.firstName, x, y, 60);
-          x += 60;
-          this.textInRow(doc, r.middleName, x, y, 60);
-          x += 60;
-          this.textInRow(doc, r.suffix, x, y + 5.7, 35);
-          x += 35;
-          this.textInRow(doc, r.gender, x, y, 30);
-          x += 30;
-          this.textInRow(doc, dob.toISOString().slice(0, 10), x, y, 40);
-          x += 40;
-          this.textInRow(doc, r.civilStatus, x, y, 45);
-          x += 45;
-          this.textInRow(doc, r.employmentStatus, x, y, 75);
-          x += 75;
-          this.textInRow(doc, r.presentBarangay, x, y, 60);
-          x += 60;
-          this.textInRow(doc, r.presentCity, x, y, 60);
-          x += 60;
-          this.textInRow(doc, r.presentProvince, x, y, 60);
-          x += 60;
-          this.textInRow(doc, r.presentDistrict, x, y, 60);
+          var valueParams: string[] = [r.firstName, r.middleName, r.lastName, r.suffix, dob.toISOString().slice(0, 10), r.gender, r.civilStatus, r.presentBarangay, r.presentStreetname, r.mobileNos, r.telephoneNos, r.email];
+
+          //body
+          for (var c in columnParams) {
+            this.textInRow(doc, valueParams[columnParams[c][1]], x, y, columnParams[c][2], false);
+            x += columnParams[c][2];
+          }
 
           recordCntr += 1;
           y += 10;
@@ -139,7 +110,126 @@ export default class PDFService implements IPDFService {
     return result;
   }
 
+  // public async SaveToPdf_bak(entity: any, totalRecords: number, isSaveToS3: bool): Promise<IResult> {
+  //   let result: IResult = null;
 
+  //   try {
+  //     const fileName = './SearchCitizen' + randomIntFromInterval(1000, 2000).toString() + '.pdf';
+
+  //     const PDFDocument = require('pdfkit');
+
+  //     var doc = new PDFDocument({ layout: 'landscape' });
+
+  //     doc.pipe(fs.createWriteStream(fileName));
+
+  //     console.log("total : " + totalRecords.toString());
+
+  //     var recordBreaker = 47;
+  //     var totalPage = Math.ceil(totalRecords / recordBreaker);
+
+  //     var xBase = 20
+  //     var yBase = 60
+
+  //     var x = xBase;
+  //     var y = yBase;
+  //     var width = 30;
+  //     var height = 100;
+
+  //     var recordCntr = 1;
+
+  //     for (let i = 0; i < totalPage; i++) {
+  //       var b = await this.breakEntity(i, recordBreaker, entity);
+
+  //       //header
+  //       this.textInRow(doc, "#", x, y - 10, 15);
+  //       x += 15;
+  //       this.textInRow(doc, "institutionId", x, y - 10, 100);
+  //       x += 100;
+  //       this.textInRow(doc, "lastName", x, y - 10, 60);
+  //       x += 60;
+  //       this.textInRow(doc, "firstName", x, y - 10, 60);
+  //       x += 60;
+  //       this.textInRow(doc, "middleName", x, y - 10, 60);
+  //       x += 60;
+  //       this.textInRow(doc, "suffix", x, y - 10, 35);
+  //       x += 35;
+  //       this.textInRow(doc, "gender", x, y - 10, 30);
+  //       x += 30;
+  //       this.textInRow(doc, "birth date", x, y - 10, 40);
+  //       x += 40;
+  //       this.textInRow(doc, "civilStatus", x, y - 10, 45);
+  //       x += 45;
+  //       this.textInRow(doc, "employmentStatus", x, y - 10, 75);
+  //       x += 75;
+  //       this.textInRow(doc, "presentBarangay", x, y - 10, 60);
+  //       x += 60;
+  //       this.textInRow(doc, "presentCity", x, y - 10, 60);
+  //       x += 60;
+  //       this.textInRow(doc, "presentProvince", x, y - 10, 60);
+  //       x += 60;
+  //       this.textInRow(doc, "presentDistrict", x, y - 10, 60);
+
+  //       x = xBase;
+
+  //       await b.forEach(r => {
+  //         var dob = new Date(r.birthDate);
+  //         dob.setHours(0, 0, 0, 0);
+
+  //         this.textInRow(doc, recordCntr.toString(), x, y, 15);
+  //         x += 15;
+  //         this.textInRow(doc, r.institutionId, x, y, 100);
+  //         x += 100;
+  //         this.textInRow(doc, r.lastName, x, y, 60);
+  //         x += 60;
+  //         this.textInRow(doc, r.firstName, x, y, 60);
+  //         x += 60;
+  //         this.textInRow(doc, r.middleName, x, y, 60);
+  //         x += 60;
+  //         this.textInRow(doc, r.suffix, x, y + 5.7, 35);
+  //         x += 35;
+  //         this.textInRow(doc, r.gender, x, y, 30);
+  //         x += 30;
+  //         this.textInRow(doc, dob.toISOString().slice(0, 10), x, y, 40);
+  //         x += 40;
+  //         this.textInRow(doc, r.civilStatus, x, y, 45);
+  //         x += 45;
+  //         this.textInRow(doc, r.employmentStatus, x, y, 75);
+  //         x += 75;
+  //         this.textInRow(doc, r.presentBarangay, x, y, 60);
+  //         x += 60;
+  //         this.textInRow(doc, r.presentCity, x, y, 60);
+  //         x += 60;
+  //         this.textInRow(doc, r.presentProvince, x, y, 60);
+  //         x += 60;
+  //         this.textInRow(doc, r.presentDistrict, x, y, 60);
+
+  //         recordCntr += 1;
+  //         y += 10;
+  //         x = xBase;
+  //       });
+
+  //       if (i < (totalPage - 1)) {
+  //         y = yBase;
+  //         doc.addPage();
+  //       }
+  //     }
+
+  //     doc.end();
+
+  //     if (isSaveToS3) {
+  //       const fs2 = new fileService();
+
+  //       //var fsResult = await fs.uploadFilePdf({ "fileName": saveToPdf.value.response });
+  //       result = await fs2.uploadFilePdf({ "fileName": fileName, "doc": doc });
+  //     }
+  //     else result = utilResponsePayloadSuccess(fileName, 0, 0);
+  //   }
+  //   catch (error) {
+  //     result = utilResponsePayloadSystemError(error);
+  //   }
+
+  //   return result;
+  // }
 
   public async textInRowFirst(doc, text, heigth) {
     doc.y = heigth;
@@ -155,16 +245,18 @@ export default class PDFService implements IPDFService {
     return doc
   }
 
-  public async textInRow(doc, text, x, y, width) {
+  public async textInRow(doc, text, x, y, width, isBoldText) {
     doc.x = x;
     doc.y = y;
-    doc.fontSize(4.5);
+    if(isBoldText)doc.font('Times-Bold')
+    else doc.font('Times-Roman');
+    doc.fontSize(5);
     doc.text(text, {
-      width: width,
+      width: width,      
       align: 'left'
     }
     );
-    doc.rect(doc.x - 3, doc.y - 10, width, 10).stroke();
+    //doc.rect(doc.x - 3, doc.y - 10, width, 10).stroke();
     // doc.y = y;
     // doc.x = x;
     // doc.fillColor('black')    
