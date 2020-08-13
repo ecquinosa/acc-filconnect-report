@@ -5,4 +5,4 @@ services:
     build: .
     entrypoint: ["node", "dist/app.js"]
     ports:
-      - "8100:8101"
+      - "8100:8080"
