@@ -6,6 +6,8 @@ import { ROUTE, SERVICE, ORCHESTRATION, RESPONSE_CODE } from "../../helpers/Cons
 import { IKycService } from "../../service/kycService";
 import fileService from "../../service/fileService";
 
+import { IResult, utilResponsePayloadSystemError, utilResponsePayloadSuccess, utilResponsePayloadSuccessNoParam } from "../../helpers/Utility";
+
 const route = Router();
 
 export default (app: Router) => {
@@ -29,7 +31,7 @@ export default (app: Router) => {
     //   ORCHESTRATION.PROCESS_DEFINITION.REPORT.KYC_SEARCH_CITIZEN
     // );    
 
-    logger.info(result);
+    //logger.info(result);
     return res.json({ response: result }).status(200);
   });
 
@@ -44,7 +46,7 @@ export default (app: Router) => {
       ORCHESTRATION.PROCESS_DEFINITION.REPORT.GET_FILE
     );
     
-    logger.info(result);
+    //logger.info(result);
     return res.json({ response: result }).status(200);
   });
 
@@ -59,16 +61,18 @@ export default (app: Router) => {
       ORCHESTRATION.PROCESS_DEFINITION.REPORT.DELETE_FILE
     );
     
-    logger.info(result);
+    //logger.info(result);
     return res.json({ response: result }).status(200);
   });
 
   route.post(ROUTE.REPORT.LIST_FILE, async (req: Request, res: Response, next: NextFunction) => {
-    const entity = JSON.parse(JSON.stringify(req.body));
+    const entity = JSON.parse(JSON.stringify(req.body));    
 
     const fs = new fileService();
 
-    const result = await fs.tempDeleteBayambangData(entity.payload);
+    let result: IResult = null;
+    //result = await fs.listObjects(entity.payload);
+    result = await fs.tempDeleteBayambangData(entity.payload);
     
     // const result = await camundService.Start(
     //   JSON.stringify(req.body),
@@ -76,7 +80,7 @@ export default (app: Router) => {
     //   ORCHESTRATION.PROCESS_DEFINITION.REPORT.LIST_FILE
     // );
     
-    logger.info(result);
+    //logger.info(result);
     return res.json({ response: result }).status(200);
   });
  

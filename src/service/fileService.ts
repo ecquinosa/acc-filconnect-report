@@ -186,27 +186,7 @@ export default class fileService implements IFileService {
       return await utilResponsePayloadSystemError(error);
     }
   }
-
-  public async getFileDate(entity) {
-    try {
-      const _cloudCOnfig: client.Config = Container.get(SERVICE.CLOUD_CONFIG);
-      const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
-      
-      var s3File = entity;
-      //console.log(s3File);
-
-      //var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: s3File };
-      var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}` };
-
-      var s3obj = await s3.getObject(params).promise();     
-
-      return s3obj.LastModified.valueOf()
-    }
-    catch (error) {
-      return "error";
-    }
-  }
-
+  
   public async deleteFile(entity): Promise<IResult> {
     try {
       const _cloudCOnfig: client.Config = Container.get(SERVICE.CLOUD_CONFIG);
@@ -246,13 +226,13 @@ export default class fileService implements IFileService {
       const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
 
       let isTruncated = true;
-      let marker;   
+      let marker;
       let files = [];
-      let isHalted = false;      
+      let isHalted = false;
 
-     while (isTruncated) {
+      while (isTruncated) {
         let params = {
-          Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET),          
+          Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET),
           StartAfter: entity.lastKey
         };
         // if (prefix) params.Prefix = prefix;
@@ -261,11 +241,11 @@ export default class fileService implements IFileService {
           const response = await s3.listObjectsV2(params).promise();
           var recordIndex = 1;
           for (var c in response.Contents) {
-            var paramGet = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${response.Contents[c].Key}` };            
-            let result = await s3.getObject(paramGet).promise();                                  
+            var paramGet = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${response.Contents[c].Key}` };
+            let result = await s3.getObject(paramGet).promise();
             var fileDate = new Date(result.LastModified.valueOf()); // The 0 there is the key, which sets the date to the epoch
-            fileDate.setHours(0, 0, 0, 0);                        
-            files.push({ file: response.Contents[c].Key, date: fileDate.toISOString().slice(0, 10)});
+            fileDate.setHours(0, 0, 0, 0);
+            files.push({ file: response.Contents[c].Key, date: fileDate.toISOString().slice(0, 10) });
             if (recordIndex != entity.maxKeys) recordIndex += 1;
             else {
               isHalted = true;
@@ -288,7 +268,7 @@ export default class fileService implements IFileService {
       return utilResponsePayloadSuccess(files, 0, 0);
     }
     catch (error) {
-      LoggerInstance.error("🔥 getFile error: %o", error);
+      LoggerInstance.error("🔥 listObjects error: %o", error);
       //return await "Failed to get file";
       return await utilResponsePayloadSystemError(error);
     }
@@ -300,16 +280,18 @@ export default class fileService implements IFileService {
       const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
 
       let isTruncated = true;
-      let marker;   
+      let marker;
       let files = [];
-      let isHalted = false;      
+      let isHalted = false;
 
       var startDate = new Date("2020-08-10");
       //console.log(startDate);
 
-     while (isTruncated) {
+      let lastKey;
+
+      while (isTruncated) {
         let params = {
-          Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET),          
+          Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET),
           StartAfter: entity.lastKey
         };
         // if (prefix) params.Prefix = prefix;
@@ -318,22 +300,26 @@ export default class fileService implements IFileService {
           const response = await s3.listObjectsV2(params).promise();
           var recordIndex = 1;
           for (var c in response.Contents) {
-            var paramGet = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${response.Contents[c].Key}` };            
-            let result = await s3.getObject(paramGet).promise();                                  
+            var paramGet = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${response.Contents[c].Key}` };
+            let result = await s3.getObject(paramGet).promise();
             var fileDate = new Date(result.LastModified.valueOf()); // The 0 there is the key, which sets the date to the epoch
-            fileDate.setHours(0, 0, 0, 0);   
+            fileDate.setHours(0, 0, 0, 0);
 
             // var forDelete = "No";
             // if(fileDate<startDate)forDelete = "Yes";
             //files.push({ file: response.Contents[c].Key, date: fileDate.toISOString().slice(0, 10), forDeletion: forDelete});
 
             //delete files older than startDate
-            if(fileDate<startDate) files.push({ Key: `${response.Contents[c].Key}` });            
-            if (recordIndex != entity.maxKeys) recordIndex += 1;
-            else {
-              isHalted = true;
-              isTruncated = false;
-              break;
+            if (fileDate < startDate) {
+              files.push({ Key: `${response.Contents[c].Key}` });
+
+              if (recordIndex != entity.maxKeys) recordIndex += 1;
+              else {
+                lastKey = `${response.Contents[c].Key}`;
+                isHalted = true;
+                isTruncated = false;
+                break;
+              }
             }
           }
 
@@ -346,7 +332,9 @@ export default class fileService implements IFileService {
         } catch (error) {
           throw error;
         }
-      }        
+      }
+
+      //console.log(files);
 
       var deleteParam = {
         Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET),
@@ -356,12 +344,13 @@ export default class fileService implements IFileService {
       };
 
       var s = await s3.deleteObjects(deleteParam, function (err, data) {
-        if (err) utilResponsePayloadSystemError(err);  // error
-        else return utilResponsePayloadSuccess("Files deleted", 0, 0);                 // deleted
-      }).promise();      
+        if (err) return utilResponsePayloadSystemError(err);  // error        
+      }).promise();
+
+      return utilResponsePayloadSuccess(lastKey, 0, 0);
     }
     catch (error) {
-      LoggerInstance.error("🔥 getFile error: %o", error);
+      LoggerInstance.error("🔥 tempDeleteBayambangData error: %o", error);
       //return await "Failed to get file";
       return await utilResponsePayloadSystemError(error);
     }
