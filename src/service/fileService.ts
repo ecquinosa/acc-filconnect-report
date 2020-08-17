@@ -186,11 +186,52 @@ export default class fileService implements IFileService {
       return await utilResponsePayloadSystemError(error);
     }
   }
-  
-  public async deleteFile(entity): Promise<IResult> {
+
+  public async getFilev2(entity): Promise<IResult> {
     try {
       const _cloudCOnfig: client.Config = Container.get(SERVICE.CLOUD_CONFIG);
       const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
+
+      var ext = entity.location.substring(entity.location.lastIndexOf('.') + 1);
+      var s3File = entity.location.substring(entity.location.lastIndexOf('/') + 1);
+      //console.log(s3File);
+
+      //var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: s3File };
+      var params = { Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET), Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}` };
+
+      var s3obj = await s3.getObject(params).promise();
+
+      //   s3.getObject(params, function(err, res) {
+      //     if (err === null) {
+      //        res.attachment('file.ext'); // or whatever your logic needs
+      //        res.send(data.Body);
+      //     } else {
+      //        res.status(500).send(err);
+      //     }
+      // });
+
+      let buff = await Buffer.from(s3obj.Body);
+      let base64 = await buff.toString('base64');
+
+      var response = {
+        ext: ext,
+        base64: base64
+      }
+
+      return await utilResponsePayloadSuccess(response, 0, 0);
+    }
+    catch (error) {
+      LoggerInstance.error("🔥 getFile error: %o", error);
+      //return await "Failed to get file";
+      return await utilResponsePayloadSystemError(error);
+    }
+  }
+  
+  public async deleteFile(entity): Promise<IResult> {
+    try {
+      const region = "ap-southeast-1";
+      const _cloudCOnfig: client.Config = Container.get(SERVICE.CLOUD_CONFIG);
+      const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY), region: region });
 
       var files = [];
       for (var f in entity.files) {
@@ -198,24 +239,26 @@ export default class fileService implements IFileService {
         files.push({ Key: `${_cloudCOnfig.get(CONFIG.S3.FOLDER)}/${s3File}` });
       }
 
-      var deleteParam = {
+      var deleteParam = {        
         Bucket: _cloudCOnfig.get(CONFIG.S3.BUCKET),
         Delete: {
           Objects: files
         }
       };
 
+      // var s = await s3.deleteObjects(deleteParam, function (err, data) {
+      //   if (err) utilResponsePayloadSystemError(err);  // error
+      //   else return utilResponsePayloadSuccess("Files deleted", 0, 0);                 // deleted
+      // }).promise();
+
       var s = await s3.deleteObjects(deleteParam, function (err, data) {
-        if (err) utilResponsePayloadSystemError(err);  // error
-        else return utilResponsePayloadSuccess("Files deleted", 0, 0);                 // deleted
+        if (err) return utilResponsePayloadSystemError(err);  // error          
       }).promise();
 
-      //return utilResponsePayloadSuccess("Files deleted", 0, 0);
+      return utilResponsePayloadSuccess("Files deleted", 0, 0);
     }
     catch (error) {
-      //console.log(error);
-      //LoggerInstance.error("🔥 deleteFile error: %o", error);
-      //return await "Failed to get file";
+      //console.log(error);      
       return await utilResponsePayloadSystemError(error);
     }
   }
@@ -276,8 +319,9 @@ export default class fileService implements IFileService {
 
   public async tempDeleteBayambangData(entity): Promise<IResult> {
     try {
+      const region = "ap-southeast-1";
       const _cloudCOnfig: client.Config = Container.get(SERVICE.CLOUD_CONFIG);
-      const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY) });
+      const s3 = new AWS.S3({ accessKeyId: _cloudCOnfig.get(CONFIG.S3.ACCESSKEYID), secretAccessKey: _cloudCOnfig.get(CONFIG.S3.SECRETACCESSKEY), region: region });
 
       let isTruncated = true;
       let marker;

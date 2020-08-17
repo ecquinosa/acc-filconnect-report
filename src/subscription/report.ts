@@ -32,14 +32,16 @@ async function kycSearchCitizen({ task, taskService }) {
     //const entity = JSON.parse(task.variables.get("payload"));
 
     resultService = await kycService.SearchCitizen(payload);
-    log.info(JSON.stringify(resultService.value));
-    log.info(JSON.stringify(resultService.value.response));
+    // log.info(JSON.stringify(resultService.value));
+    // log.info(JSON.stringify(resultService.value.response));
     setTypedVariable(variables, resultService.value);    
   } catch (error) {
     resultService = utilResponsePayloadSystemError(error);
-    log.info("🔥 kycSearchCitizen failed result : %o", JSON.stringify(resultService.value));
+    //log.info("🔥 kycSearchCitizen failed result : %o", JSON.stringify(resultService.value));
     setTypedVariable(variables, resultService.value);
   }  
+
+  log.info("🔥 kycSearchCitizen result : %o", JSON.stringify(resultService.value));
 
   variables.set("status", resultService.status);
 
@@ -66,9 +68,11 @@ async function getFile({ task, taskService }) {
     setTypedVariable(variables, resultService.value);    
   } catch (error) {
     resultService = utilResponsePayloadSystemError(error);
-    log.info("🔥 getFile failed result : %o", JSON.stringify(resultService.value));
+    //log.info("🔥 getFile failed result : %o", JSON.stringify(resultService.value));
     setTypedVariable(variables, resultService.value);
   }  
+
+  log.info("🔥 getFile result : %o", JSON.stringify(resultService.value));
 
   variables.set("status", resultService.status);
 
@@ -87,15 +91,15 @@ async function deleteFile({ task, taskService }) {
     const payload = taskVariables.payloadVariable.payload;
     const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;    
 
-    resultService = await kycService.deleteFile(payload);
+    resultService = await kycService.deleteFile(payload);    
 
     setTypedVariable(variables, resultService.value);    
-  } catch (error) {
-    //console.log(error);
-    resultService = utilResponsePayloadSystemError(error);
-    log.info("🔥 deleteFile failed result : %o", JSON.stringify(resultService.value));
+  } catch (error) {    
+    resultService = utilResponsePayloadSystemError(error);    
     setTypedVariable(variables, resultService.value);
   }  
+
+  log.info("🔥 deleteFile result : %o", JSON.stringify(resultService.value));
 
   variables.set("status", resultService.status);
 
