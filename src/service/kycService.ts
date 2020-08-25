@@ -107,6 +107,10 @@ export default class KycService implements IKycService {
       query = query.concat(" AND isDependent ='", payload.isDependent, "' ");
     }
 
+    if (payload.noOfChildren != "" && payload.noOfChildren != undefined) {
+      query = query.concat(" AND noOfChildren =", payload.noOfChildren, " ");
+    }    
+
     if (payload.birthCity != "" && payload.birthCity != undefined) {
       query = query.concat(" AND birthCity like '%", payload.birthCity, "%' ");
     }

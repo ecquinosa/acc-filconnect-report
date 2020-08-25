@@ -53,11 +53,12 @@ export default class PDFService implements IPDFService {
       columnParams[4] = ["BIRTHDATE", 4, 40];
       columnParams[5] = ["GENDER", 5, 30];
       columnParams[6] = ["CIVIL STATUS", 6, 45];
-      columnParams[7] = ["BARANGAY", 7, 60];
-      columnParams[8] = ["STREETNAME", 8, 60];
-      columnParams[9] = ["MOBILE NOS.", 9, 60];
-      columnParams[10] = ["TELEPHONE NOS.", 10, 60];
-      columnParams[11] = ["EMAIL", 11, 60];
+      columnParams[7] = ["NO. OF CHILDREN", 7, 45];
+      columnParams[8] = ["BARANGAY", 8, 60];
+      columnParams[9] = ["STREETNAME", 9, 60];
+      columnParams[10] = ["MOBILE NOS.", 10, 60];
+      columnParams[11] = ["TELEPHONE NOS.", 11, 60];
+      columnParams[12] = ["EMAIL", 12, 60];
 
       for (let i = 0; i < totalPage; i++) {
         var b = await this.breakEntity(i, recordBreaker, entity);
@@ -74,7 +75,7 @@ export default class PDFService implements IPDFService {
           var dob = new Date(r.birthDate);
           dob.setHours(0, 0, 0, 0);
 
-          var valueParams: string[] = [r.firstName, r.middleName, r.lastName, r.suffix, dob.toISOString().slice(0, 10), r.gender, r.civilStatus, r.presentBarangay, r.presentStreetname, r.mobileNos, r.telephoneNos, r.email];
+          var valueParams: string[] = [r.firstName, r.middleName, r.lastName, r.suffix, dob.toISOString().slice(0, 10), r.gender, r.civilStatus, r.noOfChildren, r.presentBarangay, r.presentStreetname, r.mobileNos, r.telephoneNos, r.email];
 
           //body
           for (var c in columnParams) {
