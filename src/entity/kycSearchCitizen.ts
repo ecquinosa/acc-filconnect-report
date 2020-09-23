@@ -71,6 +71,15 @@ export class KycSearchCitizen extends Base {
     length: 10,
   }) 
   birthDay: string;
+
+  @Column({ name: "age", type: "int", nullable: true, })
+  age: number;
+
+  @Column({
+    length: 10,
+    nullable: true,
+  })
+  ageBracket: string;
   
   @Column({
     default: "00000000-0000-0000-0000-000000000000",

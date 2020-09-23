@@ -14,8 +14,44 @@ export default async function () {
   camundaService = Container.get(SERVICE.CAMUNDA_SERVICE);
   kycService = Container.get(SERVICE.KYC);
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.KYC_SEARCH_CITIZEN, await kycSearchCitizen); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.KYC_CREATE_CITIZEN, await kycCreateCitizen); 
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.GET_FILE, await getFile); 
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
+}
+
+async function kycCreateCitizen({ task, taskService }) {
+  const variables = new Variables();    
+  let resultService: IResult = null;
+
+  try {
+    const taskVariables = await camundaService.GetVariables(task);
+
+    // get payload and response value.
+    const payload = taskVariables.payloadVariable.payload;
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
+    //const entity = JSON.parse(task.variables.get("payload"));
+
+    var memberId = "00000000-0000-0000-0000-000000000000";
+
+    if (response != undefined) {
+      console.log(response.memberId);
+      memberId = response.memberId;
+    }
+
+    resultService = await kycService.createCitizen(memberId, payload);
+    
+    setTypedVariable(variables, resultService.value);    
+  } catch (error) {
+    console.log(error);
+    resultService = utilResponsePayloadSystemError(error);    
+    setTypedVariable(variables, resultService.value);
+  }  
+
+  log.info("🔥 kycSearchCitizen result : %o", JSON.stringify(resultService.value));
+
+  variables.set("status", resultService.status);
+
+  taskService.complete(task, variables);
 }
 
 async function kycSearchCitizen({ task, taskService }) {
@@ -31,7 +67,7 @@ async function kycSearchCitizen({ task, taskService }) {
     const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
     //const entity = JSON.parse(task.variables.get("payload"));
 
-    resultService = await kycService.SearchCitizen(payload);
+    resultService = await kycService.SearchCitizenv2(payload);
     // log.info(JSON.stringify(resultService.value));
     // log.info(JSON.stringify(resultService.value.response));
     setTypedVariable(variables, resultService.value);    
@@ -62,7 +98,7 @@ async function getFile({ task, taskService }) {
     //const entity = JSON.parse(task.variables.get("payload"));
 
     //console.log(payload.payload);
-    resultService = await kycService.getFile(payload);
+    resultService = await kycService.getFilev2(payload);
     // log.info(JSON.stringify(resultService.value));
     // log.info(JSON.stringify(resultService.value.response));
     setTypedVariable(variables, resultService.value);    
@@ -91,7 +127,7 @@ async function deleteFile({ task, taskService }) {
     const payload = taskVariables.payloadVariable.payload;
     const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;    
 
-    resultService = await kycService.deleteFile(payload);    
+    resultService = await kycService.deleteFilev2(payload);    
 
     setTypedVariable(variables, resultService.value);    
   } catch (error) {    

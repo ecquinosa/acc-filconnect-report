@@ -23,13 +23,28 @@ export default (app: Router) => {
   route.post(ROUTE.REPORT.KYC_SEARCH_CITIZEN, async (req: Request, res: Response, next: NextFunction) => {
     const entity = JSON.parse(JSON.stringify(req.body));
 
-    const result = await kycService.SearchCitizen(entity.payload);
+    //const result = await kycService.SearchCitizenv2(entity.payload);
     
-    // const result = await camundService.Start(
-    //   JSON.stringify(req.body),
-    //   JSON.stringify(req.headers),
-    //   ORCHESTRATION.PROCESS_DEFINITION.REPORT.KYC_SEARCH_CITIZEN
-    // );    
+    const result = await camundService.Start(
+      JSON.stringify(req.body),
+      JSON.stringify(req.headers),
+      ORCHESTRATION.PROCESS_DEFINITION.REPORT.KYC_SEARCH_CITIZEN
+    );    
+
+    //logger.info(result);
+    return res.json({ response: result }).status(200);
+  });
+
+  route.post(ROUTE.REPORT.KYC_CREATE_CITIZEN, async (req: Request, res: Response, next: NextFunction) => {
+    const entity = JSON.parse(JSON.stringify(req.body));
+
+    //const result = await kycService.SearchCitizenv2(entity.payload);
+    
+    const result = await camundService.Start(
+      JSON.stringify(req.body),
+      JSON.stringify(req.headers),
+      ORCHESTRATION.PROCESS_DEFINITION.REPORT.KYC_CREATE_CITIZEN
+    );    
 
     //logger.info(result);
     return res.json({ response: result }).status(200);
@@ -38,7 +53,7 @@ export default (app: Router) => {
   route.post(ROUTE.REPORT.GET_FILE, async (req: Request, res: Response, next: NextFunction) => {
     const entity = JSON.parse(JSON.stringify(req.body));
 
-    //const result = await kycService.getFile(entity.payload);
+    //const result = await kycService.getFilev2(entity.payload);
     
     const result = await camundService.Start(
       JSON.stringify(req.body),
@@ -53,7 +68,7 @@ export default (app: Router) => {
   route.post(ROUTE.REPORT.DELETE_FILE, async (req: Request, res: Response, next: NextFunction) => {
     const entity = JSON.parse(JSON.stringify(req.body));
 
-    //const result = await kycService.getFile(entity.payload);
+    //const result = await kycService.deleteFilev2(entity.payload);
     
     const result = await camundService.Start(
       JSON.stringify(req.body),
@@ -68,17 +83,17 @@ export default (app: Router) => {
   route.post(ROUTE.REPORT.LIST_FILE, async (req: Request, res: Response, next: NextFunction) => {
     const entity = JSON.parse(JSON.stringify(req.body));    
 
-    const fs = new fileService();
+    //const fs = new fileService();
 
-    let result: IResult = null;
+    //let result: IResult = null;
     //result = await fs.listObjects(entity.payload);
-    result = await fs.tempDeleteBayambangData(entity.payload);
+    //result = await fs.tempDeleteBayambangData(entity.payload);
     
-    // const result = await camundService.Start(
-    //   JSON.stringify(req.body),
-    //   JSON.stringify(req.headers),
-    //   ORCHESTRATION.PROCESS_DEFINITION.REPORT.LIST_FILE
-    // );
+    const result = await camundService.Start(
+      JSON.stringify(req.body),
+      JSON.stringify(req.headers),
+      ORCHESTRATION.PROCESS_DEFINITION.REPORT.LIST_FILE
+    );
     
     //logger.info(result);
     return res.json({ response: result }).status(200);

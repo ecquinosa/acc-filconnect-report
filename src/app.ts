@@ -23,6 +23,7 @@ async function Main() {
   const port = configuration.get("server.port");
   const appname = configuration.get("spring.application.name");
 
+  //app.listen(port, () => {
   app.listen(port, (err) => {
     if (err) {
       Logger.error(err);

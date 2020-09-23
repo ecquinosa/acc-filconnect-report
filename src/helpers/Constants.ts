@@ -11,6 +11,7 @@ export const ROUTE = {
   REPORT: {
     MAIN: "/report",
     KYC_SEARCH_CITIZEN: "/kycSearchCitizen",
+    KYC_CREATE_CITIZEN: "/kycCreateCitizen",
     GET_FILE: "/getFile",
     DELETE_FILE: "/deleteFile",
     LIST_FILE: "/listFiles",
@@ -21,6 +22,7 @@ export const ORCHESTRATION = {
   TOPIC: {
     REPORT: {
       KYC_SEARCH_CITIZEN: "reportKycSearchCitizen",
+      KYC_CREATE_CITIZEN: "reportKycCreateCitizen",
       GET_FILE: "reportGetFile",
       DELETE_FILE: "reportDeleteFile",
       LIST_FILE: "reportListFiles",
@@ -29,6 +31,7 @@ export const ORCHESTRATION = {
   PROCESS_DEFINITION: {
     REPORT: {
       KYC_SEARCH_CITIZEN: "reportKycSearchCitizen",
+      KYC_CREATE_CITIZEN: "reportKycCreateCitizen",
       GET_FILE: "reportGetFile",
       DELETE_FILE: "reportDeleteFile",
       LIST_FILE: "reportListFiles"
@@ -70,6 +73,13 @@ export const CONFIG = {
     SECRETACCESSKEY: "s3.secretaccesskey",
     FOLDER: "s3.folder"
   },
+  FILE: {
+    BUCKET: "file.bucketname",
+    ACCESS_KEY: "file.accesskeyid",
+    ACCESS_SECRET: "file.secretaccesskey",
+    FOLDER: "file.folder",
+    DOMAIN: "file.domain",
+  },
 };
 
 export const RESPONSE_CODE = {
@@ -95,4 +105,12 @@ export const STATUS = {
   SUCCESS: "success",
   FAILED: "failed",
   CANCEL: "cancel",
+};
+
+export const TABLE_UUID = {
+  relationshipFather: '1fdfdbee-6eb1-ea11-aa80-0a75e0afb438'.toUpperCase(),
+  relationshipMother: '20dfdbee-6eb1-ea11-aa80-0a75e0afb438'.toUpperCase(),
+  telephoneNos: 'f56998d0-2bab-ea11-aa80-0a46f5c1402c'.toUpperCase(),
+  mobileNos: 'f66998d0-2bab-ea11-aa80-0a46f5c1402c'.toUpperCase(),
+  email: '334ee2d8-2bab-ea11-aa80-0a46f5c1402c'.toUpperCase(),
 };
