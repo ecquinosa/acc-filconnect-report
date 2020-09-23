@@ -50,6 +50,66 @@ export default (app: Router) => {
     return res.json({ response: result }).status(200);
   });
 
+  route.post(ROUTE.REPORT.KYC_UPDATE_CITIZEN, async (req: Request, res: Response, next: NextFunction) => {
+    const entity = JSON.parse(JSON.stringify(req.body));
+
+    //const result = await kycService.SearchCitizenv2(entity.payload);
+    
+    const result = await camundService.Start(
+      JSON.stringify(req.body),
+      JSON.stringify(req.headers),
+      ORCHESTRATION.PROCESS_DEFINITION.REPORT.KYC_UPDATE_CITIZEN
+    );    
+
+    //logger.info(result);
+    return res.json({ response: result }).status(200);
+  });
+
+  route.post(ROUTE.REPORT.KYC_UPDATE_ADDRESS_CITIZEN, async (req: Request, res: Response, next: NextFunction) => {
+    const entity = JSON.parse(JSON.stringify(req.body));
+
+    //const result = await kycService.SearchCitizenv2(entity.payload);
+    
+    const result = await camundService.Start(
+      JSON.stringify(req.body),
+      JSON.stringify(req.headers),
+      ORCHESTRATION.PROCESS_DEFINITION.REPORT.KYC_UPDATE_ADDRESS_CITIZEN
+    );    
+
+    //logger.info(result);
+    return res.json({ response: result }).status(200);
+  });
+
+  route.post(ROUTE.REPORT.KYC_UPDATE_CONTACTINFO_CITIZEN, async (req: Request, res: Response, next: NextFunction) => {
+    const entity = JSON.parse(JSON.stringify(req.body));
+
+    //const result = await kycService.SearchCitizenv2(entity.payload);
+    
+    const result = await camundService.Start(
+      JSON.stringify(req.body),
+      JSON.stringify(req.headers),
+      ORCHESTRATION.PROCESS_DEFINITION.REPORT.KYC_UPDATE_CONTACTINFO_CITIZEN
+    );    
+
+    //logger.info(result);
+    return res.json({ response: result }).status(200);
+  });
+
+  route.post(ROUTE.REPORT.KYC_UPDATE_AGE_CITIZEN, async (req: Request, res: Response, next: NextFunction) => {
+    const entity = JSON.parse(JSON.stringify(req.body));
+
+    //const result = await kycService.SearchCitizenv2(entity.payload);
+    
+    const result = await camundService.Start(
+      JSON.stringify(req.body),
+      JSON.stringify(req.headers),
+      ORCHESTRATION.PROCESS_DEFINITION.REPORT.KYC_UPDATE_AGE_CITIZEN
+    );    
+
+    //logger.info(result);
+    return res.json({ response: result }).status(200);
+  });
+
   route.post(ROUTE.REPORT.GET_FILE, async (req: Request, res: Response, next: NextFunction) => {
     const entity = JSON.parse(JSON.stringify(req.body));
 

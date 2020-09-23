@@ -15,6 +15,10 @@ export default async function () {
   kycService = Container.get(SERVICE.KYC);
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.KYC_SEARCH_CITIZEN, await kycSearchCitizen); 
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.KYC_CREATE_CITIZEN, await kycCreateCitizen); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.KYC_UPDATE_CITIZEN, await kycUpdateCitizen); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.KYC_UPDATE_ADDRESS_CITIZEN, await kycUpdateAddressCitizen); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.KYC_UPDATE_CONTACTINFO_CITIZEN, await kycUpdateContactInfoCitizen); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.KYC_UPDATE_AGE_CITIZEN, await kycUpdateAgeCitizen); 
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.GET_FILE, await getFile); 
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
 }
@@ -28,17 +32,11 @@ async function kycCreateCitizen({ task, taskService }) {
 
     // get payload and response value.
     const payload = taskVariables.payloadVariable.payload;
-    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
-    //const entity = JSON.parse(task.variables.get("payload"));
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;    
 
-    var memberId = "00000000-0000-0000-0000-000000000000";
+    var memberId = "00000000-0000-0000-0000-000000000000";  
 
-    if (response != undefined) {
-      console.log(response.memberId);
-      memberId = response.memberId;
-    }
-
-    resultService = await kycService.createCitizen(memberId, payload);
+    resultService = await kycService.createCitizen(payload, response);
     
     setTypedVariable(variables, resultService.value);    
   } catch (error) {
@@ -47,7 +45,115 @@ async function kycCreateCitizen({ task, taskService }) {
     setTypedVariable(variables, resultService.value);
   }  
 
-  log.info("🔥 kycSearchCitizen result : %o", JSON.stringify(resultService.value));
+  log.info("🔥 kycCreateCitizen result : %o", JSON.stringify(resultService.value));
+
+  variables.set("status", resultService.status);
+
+  taskService.complete(task, variables);
+}
+
+async function kycUpdateCitizen({ task, taskService }) {
+  const variables = new Variables();    
+  let resultService: IResult = null;
+
+  try {
+    const taskVariables = await camundaService.GetVariables(task);
+
+    // get payload and response value.
+    const payload = taskVariables.payloadVariable.payload;
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;        
+
+    resultService = await kycService.update(payload);
+    
+    setTypedVariable(variables, resultService.value);    
+  } catch (error) {
+    console.log(error);
+    resultService = utilResponsePayloadSystemError(error);    
+    setTypedVariable(variables, resultService.value);
+  }  
+
+  log.info("🔥 kycUpdateCitizen result : %o", JSON.stringify(resultService.value));
+
+  variables.set("status", resultService.status);
+
+  taskService.complete(task, variables);
+}
+
+async function kycUpdateAddressCitizen({ task, taskService }) {
+  const variables = new Variables();    
+  let resultService: IResult = null;
+
+  try {
+    const taskVariables = await camundaService.GetVariables(task);
+
+    // get payload and response value.
+    const payload = taskVariables.payloadVariable.payload;
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;        
+
+    resultService = await kycService.updateAddress(payload);
+    
+    setTypedVariable(variables, resultService.value);    
+  } catch (error) {
+    console.log(error);
+    resultService = utilResponsePayloadSystemError(error);    
+    setTypedVariable(variables, resultService.value);
+  }  
+
+  log.info("🔥 kycUpdateAddressCitizen result : %o", JSON.stringify(resultService.value));
+
+  variables.set("status", resultService.status);
+
+  taskService.complete(task, variables);
+}
+
+async function kycUpdateContactInfoCitizen({ task, taskService }) {
+  const variables = new Variables();    
+  let resultService: IResult = null;
+
+  try {
+    const taskVariables = await camundaService.GetVariables(task);
+
+    // get payload and response value.
+    const payload = taskVariables.payloadVariable.payload;
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;        
+
+    resultService = await kycService.updateContactInfo(payload);
+    
+    setTypedVariable(variables, resultService.value);    
+  } catch (error) {
+    console.log(error);
+    resultService = utilResponsePayloadSystemError(error);    
+    setTypedVariable(variables, resultService.value);
+  }  
+
+  log.info("🔥 kycUpdateContactInfoCitizen result : %o", JSON.stringify(resultService.value));
+
+  variables.set("status", resultService.status);
+
+  taskService.complete(task, variables);
+}
+
+async function kycUpdateAgeCitizen({ task, taskService }) {
+  const variables = new Variables();    
+  let resultService: IResult = null;
+
+  try {
+    const taskVariables = await camundaService.GetVariables(task);
+
+    // get payload and response value.
+    const payload = taskVariables.payloadVariable.payload;
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;        
+
+    resultService = await kycService.updateAge();
+    
+    setTypedVariable(variables, resultService.value);    
+  } catch (error) {
+    console.log(error);
+    resultService = utilResponsePayloadSystemError(error);    
+    setTypedVariable(variables, resultService.value);
+  }  
+
+  log.info("🔥 kycUpdateAgeCitizen result : %o", JSON.stringify(resultService.value));
 
   variables.set("status", resultService.status);
 

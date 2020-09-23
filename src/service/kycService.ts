@@ -12,34 +12,39 @@ import { uploadFile, randomIntFromInterval } from "../helpers/Utility";
 
 import fs, { unlink } from 'fs';
 
-export interface IKycService {  
-  createCitizen(memberId, payload): Promise<IResult>;
+export interface IKycService {
+  createCitizen(payload, response): Promise<IResult>;
+  update(payload): Promise<IResult>;
+  updateAddress(payload): Promise<IResult>;
+  updateContactInfo(payload): Promise<IResult>;
+  updateAge(): Promise<IResult>;  
   SearchCitizen(payload): Promise<IResult>;
   SearchCitizenv2(payload): Promise<IResult>;
   getFilev1(payload): Promise<IResult>;
   getFilev2(payload): Promise<IResult>;
   deleteFilev1(payload): Promise<IResult>;
-  deleteFilev2(payload): Promise<IResult>;  
+  deleteFilev2(payload): Promise<IResult>;
 }
 
 // Service layer where to put all the business logic computation % etc.
 @Service()
 export default class KycService implements IKycService {
 
-  public async createCitizen(memberId, entity): Promise<IResult> {
-    let memberEntity: KycSearchCitizen = entity;
+  public async createCitizen(payload, response): Promise<IResult> {
+    let memberEntity: KycSearchCitizen = payload;
     var dateFormat = require('dateformat');
     const conn = getConnection();
     var memberRepository = await conn.getRepository(KycSearchCitizen);
 
-    var record = await memberRepository.createQueryBuilder("KycSearchCitizen")      
-      .where("firstName = :firstName", { firstName: entity.firstName })
-      .andWhere("middleName = :middleName", { middleName: entity.middleName })
-      .andWhere("lastName = :lastName", { lastName: entity.lastName })
+    var record = await memberRepository.createQueryBuilder("KycSearchCitizen")
+      .where("institutionId = :institutionId", { institutionId: payload.institutionId })
+      .andWhere("firstName = :firstName", { firstName: payload.firstName })
+      .andWhere("middleName = :middleName", { middleName: payload.middleName })
+      .andWhere("lastName = :lastName", { lastName: payload.lastName })
       .getOne();
 
     if (!record) {
-      var dob = new Date(entity.birthDate);
+      var dob = new Date(payload.birthDate);
       dob.setHours(0, 0, 0, 0);
       memberEntity.birthDate = dob;
       memberEntity.birthDay = dateFormat(dob, "mmddhhMM").toString().slice(0, 4);
@@ -50,110 +55,203 @@ export default class KycService implements IKycService {
       if (age > 18 && age < 41) ageBracket = '19-40';
       if (age > 40 && age < 61) ageBracket = '41-60';
 
-      memberEntity.memberId = memberId;
-      memberEntity.userProfileId = entity.userProfileId;
-      memberEntity.institutionId = entity.institutionId;
-      memberEntity.lastName = entity.lastName;
-      memberEntity.firstName = entity.firstName;
-      memberEntity.middleName = entity.middleName;
-      memberEntity.suffix = entity.suffix;
-      memberEntity.gender = entity.gender;
+      memberEntity.memberId = response.uuid;
+      memberEntity.userProfileId = response.userProfileId;
+      memberEntity.institutionId = payload.institutionId;
+      memberEntity.lastName = payload.lastName;
+      memberEntity.firstName = payload.firstName;
+      memberEntity.middleName = payload.middleName;
+      memberEntity.suffix = payload.suffix;
+      memberEntity.gender = payload.gender;
       memberEntity.age = age;
       memberEntity.ageBracket = ageBracket;
-      memberEntity.civilStatusId = entity.civilStatusId;
-      memberEntity.civilStatus = entity.civilStatus;
-      memberEntity.birthCityId = entity.birthCityId;
-      memberEntity.birthCity = entity.birthCity;
-      memberEntity.birthProvinceId = entity.birthProvinceId;
-      memberEntity.birthProvince = entity.birthProvince;
-      memberEntity.noOfChildren = entity.noOfChildren;
-      memberEntity.employmentStatusId = entity.employmentStatusId;
-      memberEntity.employmentStatus = entity.employmentStatus;
-      memberEntity.isRegisteredVoter = entity.isRegisteredVoter;
-      memberEntity.isPwd = entity.isPwd;
-      memberEntity.isDependent = entity.isDependent;
+      memberEntity.civilStatusId = payload.civilStatusId;
+      memberEntity.civilStatus = payload.civilStatus;
+      memberEntity.birthCityId = payload.birthCityId;
+      memberEntity.birthCity = payload.birthCity;
+      memberEntity.birthProvinceId = payload.birthProvinceId;
+      memberEntity.birthProvince = payload.birthProvince;
+      memberEntity.noOfChildren = payload.noOfChildren;
+      memberEntity.employmentStatusId = payload.employmentStatusId;
+      memberEntity.employmentStatus = payload.employmentStatus;
+      memberEntity.isRegisteredVoter = payload.isRegisteredVoter;
+      memberEntity.isPwd = payload.isPwd;
+      memberEntity.isDependent = payload.isDependent;
 
-      if (entity.payload.address != undefined) {
-        memberEntity.presentRoomFloorUnitBldg = entity.presentRoomFloorUnitBldg;
-        memberEntity.presentHouseLotBlock = entity.presentHouseLotBlock;
-        memberEntity.presentStreetname = entity.presentStreetname;
-        memberEntity.presentSubdivision = entity.presentSubdivision;
-        memberEntity.presentBarangayId = entity.presentBarangayId;
-        memberEntity.presentBarangay = entity.presentBarangay;
-        memberEntity.presentCityId = entity.presentCityId;
-        memberEntity.presentCity = entity.presentCity;
-        memberEntity.presentProvinceId = entity.presentProvinceId;
-        memberEntity.presentProvince = entity.presentProvince;
-        memberEntity.presentPostal = entity.presentPostal;
-        memberEntity.presentDistrictId = entity.presentDistrictId;
-        memberEntity.presentDistrict = entity.presentDistrict;
+      if (payload.address != undefined) {
+        memberEntity.presentRoomFloorUnitBldg = payload.address.presentRoomFloorUnitBldg;
+        memberEntity.presentHouseLotBlock = payload.address.presentHouseLotBlock;
+        memberEntity.presentStreetname = payload.address.presentStreetname;
+        memberEntity.presentSubdivision = payload.address.presentSubdivision;
+        memberEntity.presentBarangayId = payload.address.presentBarangayId;
+        memberEntity.presentBarangay = payload.address.presentBarangay;
+        memberEntity.presentCityId = payload.address.presentCityId;
+        memberEntity.presentCity = payload.address.presentCity;
+        memberEntity.presentProvinceId = payload.address.presentProvinceId;
+        memberEntity.presentProvince = payload.address.presentProvince;
+        memberEntity.presentPostal = payload.address.presentPostal;
+        memberEntity.presentDistrictId = payload.address.presentDistrictId;
+        memberEntity.presentDistrict = payload.address.presentDistrict;
       }
 
-      if (entity.payload.contact != undefined) {
-        var resultContactInfo1 = entity.payload.contact;
+      if (payload.contact != undefined) {
+        var resultContactInfo1 = payload.contact;
         var telephoneNos = resultContactInfo1.find(({ type }) => type === TABLE_UUID.telephoneNos);
         var mobileNos = resultContactInfo1.find(({ type }) => type === TABLE_UUID.mobileNos);
         var email = resultContactInfo1.find(({ type }) => type === TABLE_UUID.email);
 
-        memberEntity.telephoneNos = telephoneNos;
-        memberEntity.mobileNos = mobileNos;
-        memberEntity.email = email;
-      }      
+        memberEntity.telephoneNos = telephoneNos.value;
+        memberEntity.mobileNos = mobileNos.value;
+        memberEntity.email = email.value;
+      }
 
       var saveResult = await memberRepository.save(memberEntity);
 
-      if(saveResult) utilResponsePayloadSuccess(saveResult, 0, 0);      
-      else return utilResponsePayloadSystemError("Failed to add report kyc citizen");      
+      if (saveResult) return utilResponsePayloadSuccess(saveResult, 0, 0);
+      else return utilResponsePayloadSystemError("Failed to add report kyc citizen");
     }
-    // else {
-    //   return await this.update(entity);
-    // }
+    else {
+      return utilResponsePayloadSystemError("Already exist");
+    }
   }
 
-  // public async update(entity) {
+  public async update(payload): Promise<IResult> {
 
-  //   const conn = getConnection();
-  //   var entityRepository = await conn.getRepository(KycSearchCitizen);
+    const conn = getConnection();
+    var entityRepository = await conn.getRepository(KycSearchCitizen);
 
-  //   var dateFormat = require('dateformat');
+    var dateFormat = require('dateformat');
 
-  //   var dob = new Date(entity.birthDate);
-  //   dob.setHours(0, 0, 0, 0);
+    var dob = new Date(payload.birthDate);
+    dob.setHours(0, 0, 0, 0);
 
-  //   var query = "update KycSearchCitizen set "
-  //   query = query.concat(" institutionId = '", entity.institutionId, "',");
-  //   query = query.concat(" gender = '", entity.gender, "',");
-  //   query = query.concat(" birthDate = '", dob.toISOString().slice(0, 10), "',");
-  //   query = query.concat(" presentCity = '", entity.presentCity, "',");
-  //   query = query.concat(" presentProvince = '", entity.presentProvince, "',");
+    var query = "update KycSearchCitizen set "
 
-  //   query = query.concat(" birthDay = '", (await this.getBirthDayFormat(dob)).toString(), "',");
+    query = query.concat(" lastName = '", payload.lastName, "',");
+    query = query.concat(" firstName = '", payload.firstName, "',");
+    query = query.concat(" middleName = '", payload.middleName, "',");
+    query = query.concat(" suffix = '", payload.suffix, "',");
+    query = query.concat(" gender = '", payload.gender, "',");
+    query = query.concat(" age = CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETD ATE())/365.25 AS int),");
+    query = query.concat(" ageBracket = case \
+    when CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int)<=18 THEN '0-18' \
+    WHEN CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int) BETWEEN 19 AND 40 THEN '19-40' \
+    WHEN CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int) BETWEEN 41 AND 60 THEN '41-60' \
+    ELSE '60+' END,");
+    query = query.concat(" birthDate = '", dob.toISOString().slice(0, 10), "',");
+    query = query.concat(" birthDay = '", (await this.getBirthDayFormat(dob)).toString(), "',");
 
-  //   query = query.concat(" age = CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETD ATE())/365.25 AS int),");
-  //   query = query.concat(" ageBracket = case \
-  //   when CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int)<=18 THEN '0-18' \
-  //   WHEN CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int) BETWEEN 19 AND 40 THEN '19-40' \
-  //   WHEN CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int) BETWEEN 41 AND 60 THEN '41-60' \
-  //   ELSE '60+' END,");
+    query = query.concat(" civilStatusId = '", payload.civilStatusId, "',");
+    query = query.concat(" civilStatus = '", payload.civilStatus, "',");
+    query = query.concat(" birthCityId = '", payload.birthCityId, "',");
+    query = query.concat(" birthCity = '", payload.birthCity, "',");
+    query = query.concat(" birthProvinceId = '", payload.birthProvinceId, "',");
+    query = query.concat(" birthProvince = '", payload.birthProvince, "',");
+    query = query.concat(" noOfChildren = ", payload.noOfChildren, ",");
+    query = query.concat(" employmentStatusId = '", payload.employmentStatusId, "',");
+    query = query.concat(" employmentStatus = '", payload.employmentStatus, "',");
+    query = query.concat(" isRegisteredVoter = '", payload.isRegisteredVoter, "',");
+    query = query.concat(" isPwd = '", payload.isPwd, "',");
+    query = query.concat(" isDependent = '", payload.isDependent, "',");
 
-  //   query = query.concat(" updated = GETDATE() ");
+    query = query.concat(" updated = GETDATE() ");
 
-  //   query = query.concat(" WHERE (select id from Member where uuid = '", entity.memberId, "') = memberId ");
+    query = query.concat(" WHERE uuid = '", payload.memberId, "' ");
 
-  //   var result = await entityRepository.query(query);
+    var updateResult = await entityRepository.query(query);
 
-  //   var record = await entityRepository.createQueryBuilder("KycSearchCitizen")
-  //     .select([
-  //       "member.uuid",
-  //       "KycSearchCitizen.age",
-  //       "KycSearchCitizen.ageBracket"
-  //     ])
-  //     .innerJoin("KycSearchCitizen.member", "member")
-  //     .where("member.uuid = :memberId", { memberId: entity.memberId })
-  //     .getOne();
+    if (updateResult) return utilResponsePayloadSuccess(updateResult, 0, 0);
+    else return utilResponsePayloadSystemError("Failed to update report update");
+  }
 
-  //   return await record;
-  // }
+  public async updateAge(): Promise<IResult> {
+
+    const conn = getConnection();
+    var entityRepository = await conn.getRepository(KycSearchCitizen);
+
+    var dateFormat = require('dateformat');
+
+    var dob = new Date();
+    dob.setHours(0, 0, 0, 0);
+
+    var query = "update KycSearchCitizen set "
+    
+    query = query.concat(" age = CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETD ATE())/365.25 AS int),");
+    query = query.concat(" ageBracket = case \
+    when CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int)<=18 THEN '0-18' \
+    WHEN CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int) BETWEEN 19 AND 40 THEN '19-40' \
+    WHEN CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int) BETWEEN 41 AND 60 THEN '41-60' \
+    ELSE '60+' END,");
+
+    query = query.concat(" updated = GETDATE() ");
+
+    query = query.concat(" WHERE birthDay = '", (await this.getBirthDayFormat(dob)).toString(), "' ");
+
+    var updateResult = await entityRepository.query(query);
+
+    if (updateResult) return utilResponsePayloadSuccess(updateResult, 0, 0);
+    else return utilResponsePayloadSystemError("Failed to update report update");
+  }
+
+  public async updateAddress(payload): Promise<IResult> {
+
+    const conn = getConnection();
+    var entityRepository = await conn.getRepository(KycSearchCitizen);  
+
+    var query = "update KycSearchCitizen set "
+
+    query = query.concat(" presentRoomFloorUnitBldg = '", payload.presentRoomFloorUnitBldg, "',");
+    query = query.concat(" presentHouseLotBlock = '", payload.presentHouseLotBlock, "',");
+    query = query.concat(" presentStreetname = '", payload.presentStreetname, "',");
+    query = query.concat(" presentSubdivision = '", payload.presentSubdivision, "',");
+    query = query.concat(" presentBarangayId = '", payload.presentBarangayId, "',");
+    query = query.concat(" presentBarangay = '", payload.presentBarangay, "',");
+    query = query.concat(" presentCityId = '", payload.presentCityId, "',");
+    query = query.concat(" presentCity = '", payload.presentCity, "',");
+    query = query.concat(" presentDistrictId = '", payload.presentDistrictId, "',");
+    query = query.concat(" presentDistrict = '", payload.presentDistrict, "',");
+  
+    query = query.concat(" updated = GETDATE() ");
+
+    query = query.concat(" WHERE uuid = '", payload.memberId, "' ");
+
+    var updateResult = await entityRepository.query(query);
+
+    if (updateResult) return utilResponsePayloadSuccess(updateResult, 0, 0);
+    else return utilResponsePayloadSystemError("Failed to update report updateAddress");
+  }
+
+  public async updateContactInfo(payload): Promise<IResult> {
+
+    const conn = getConnection();
+    var entityRepository = await conn.getRepository(KycSearchCitizen);  
+
+    var query = "update KycSearchCitizen set "
+
+    if (payload.telephoneNos != "" && payload.telephoneNos != undefined) {
+      query = query.concat(" telephoneNos = '", payload.telephoneNos, "'");
+    }
+
+    if (payload.mobileNos != "" && payload.mobileNos != undefined) {
+      if (query.indexOf("telephoneNos") > 0) query = query.concat(",");
+      query = query.concat(" mobileNos = '", payload.mobileNos, "'");
+    }
+
+    if (payload.email != "" && payload.email != undefined) {
+      if (query.indexOf("telephoneNos") == -1 && query.indexOf("mobileNos") == -1) query = query.concat(" ");
+      else query = query.concat(",");
+      query = query.concat(" email = '", payload.email, "'");
+    }    
+  
+    query = query.concat(" updated = GETDATE() ");
+
+    query = query.concat(" WHERE uuid = '", payload.memberId, "' ");
+
+    var updateResult = await entityRepository.query(query);
+
+    if (updateResult) return utilResponsePayloadSuccess(updateResult, 0, 0);
+    else return utilResponsePayloadSystemError("Failed to update report updateContactInfo");
+  }
 
   async getBirthDayFormat(obj: Date) {
     var dobMonth = obj.getUTCMonth() + 1;
@@ -164,7 +262,6 @@ export default class KycService implements IKycService {
     if (dobDay < 10) { dobDayStr = '0' + dobDay.toString() }
     return await dobMonthStr + dobDayStr;
   }
-
 
   public async calculate_age(dob) {
     var dt = new Date(dob);
@@ -517,13 +614,13 @@ export default class KycService implements IKycService {
         const saveToXls = await es.SaveToXls(repoResponse, repoResponse.length);
         if (saveToXls.status == "success") {
 
-          var xlsFileName = saveToXls.value.response.toString().replace("./", "");                    
+          var xlsFileName = saveToXls.value.response.toString().replace("./", "");
 
           const uploadResult: IResult = await uploadFile(await fs.base64_encode(saveToXls.value.response.toString()), xlsFileName, false, "fileService");
           if (uploadResult.value.responseCode === RESPONSE_CODE.SUCCESS.CODE) {
             files.push({ ext: xlsFileName });
             unlink(saveToXls.value.response.toString(), (err) => { if (err) { console.log("🔥 file deletion error: %o", err); } })
-          } 
+          }
           // else {
           //   result.status = "failed";
           //   result.value = uploadResult.value;
@@ -534,18 +631,16 @@ export default class KycService implements IKycService {
       if (pdf != null) {
         const ps = new PDFService();
         const saveToPdf = await ps.SaveToPdf(repoResponse, repoResponse.length, false);
-        if (saveToPdf.status == "success") 
-        {
-          var pdfFileName = saveToPdf.value.response.toString().replace("./", "");                    
+        if (saveToPdf.status == "success") {
+          var pdfFileName = saveToPdf.value.response.toString().replace("./", "");
 
           const uploadResult: IResult = await uploadFile(await fs.base64_encode(saveToPdf.value.response.toString()), pdfFileName, false, "fileService");
-          if (uploadResult.value.responseCode === RESPONSE_CODE.SUCCESS.CODE) 
-          {
+          if (uploadResult.value.responseCode === RESPONSE_CODE.SUCCESS.CODE) {
             files.push({ ext: pdfFileName });
             unlink(saveToPdf.value.response.toString(), (err) => { if (err) { console.log("🔥 file deletion error: %o", err); } })
           }
-          
-        }        
+
+        }
       }
 
       if (files.length > 0) result = utilResponsePayloadSuccess(files, 0, 0);
@@ -585,11 +680,11 @@ export default class KycService implements IKycService {
 
   public async deleteFilev2(payload) {
     const fs = new fileService();
-  
-    var responses = [];    
+
+    var responses = [];
 
     for (var f in payload.files) {
-      const deleteResult: IResult = await deleteFile(payload.files[f].key, "fileService");            
+      const deleteResult: IResult = await deleteFile(payload.files[f].key, "fileService");
       if (deleteResult.value.responseCode == RESPONSE_CODE.SUCCESS.CODE) {
         responses.push(payload.files[f].key + ' is deleted.');
       } else responses.push('Failed to delete ' + payload.files[f].key + '. ' + deleteResult.value.responseMessage);

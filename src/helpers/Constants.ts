@@ -12,6 +12,10 @@ export const ROUTE = {
     MAIN: "/report",
     KYC_SEARCH_CITIZEN: "/kycSearchCitizen",
     KYC_CREATE_CITIZEN: "/kycCreateCitizen",
+    KYC_UPDATE_CITIZEN: "/kycUpdateCitizen",
+    KYC_UPDATE_ADDRESS_CITIZEN: "/kycUpdateAddressCitizen",
+    KYC_UPDATE_CONTACTINFO_CITIZEN: "/kycUpdateContactInfoCitizen",
+    KYC_UPDATE_AGE_CITIZEN: "/kycUpdateAgeCitizen",
     GET_FILE: "/getFile",
     DELETE_FILE: "/deleteFile",
     LIST_FILE: "/listFiles",
@@ -23,6 +27,10 @@ export const ORCHESTRATION = {
     REPORT: {
       KYC_SEARCH_CITIZEN: "reportKycSearchCitizen",
       KYC_CREATE_CITIZEN: "reportKycCreateCitizen",
+      KYC_UPDATE_CITIZEN: "reportKycUpdateCitizen",
+      KYC_UPDATE_ADDRESS_CITIZEN: "reportKycUpdateAddressCitizen",
+      KYC_UPDATE_CONTACTINFO_CITIZEN: "reportKycUpdateContactInfoCitizen",
+      KYC_UPDATE_AGE_CITIZEN: "reportKycUpdateAgeCitizen",
       GET_FILE: "reportGetFile",
       DELETE_FILE: "reportDeleteFile",
       LIST_FILE: "reportListFiles",
@@ -32,6 +40,10 @@ export const ORCHESTRATION = {
     REPORT: {
       KYC_SEARCH_CITIZEN: "reportKycSearchCitizen",
       KYC_CREATE_CITIZEN: "reportKycCreateCitizen",
+      KYC_UPDATE_CITIZEN: "reportKycUpdateCitizen",
+      KYC_UPDATE_ADDRESS_CITIZEN: "reportKycUpdateAddressCitizen",
+      KYC_UPDATE_CONTACTINFO_CITIZEN: "reportKycUpdateContactInfoCitizen",
+      KYC_UPDATE_AGE_CITIZEN: "reportKycUpdateAgeCitizen",
       GET_FILE: "reportGetFile",
       DELETE_FILE: "reportDeleteFile",
       LIST_FILE: "reportListFiles"

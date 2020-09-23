@@ -55,11 +55,13 @@ export class KycSearchCitizen extends Base {
   @Column({
     default: "00000000-0000-0000-0000-000000000000",
     type: "uniqueidentifier",
+    nullable: true,
   })
   civilStatusId: string;
 
   @Column({
     length: 20,
+    nullable: true,
   })
   civilStatus: string;
 
@@ -84,26 +86,30 @@ export class KycSearchCitizen extends Base {
   @Column({
     default: "00000000-0000-0000-0000-000000000000",
     type: "uniqueidentifier",
+    nullable: true,
   })
   birthCityId: string;
 
   @Column({
     length: 40,
+    nullable: true,
   })
   birthCity: string;
 
   @Column({
     default: "00000000-0000-0000-0000-000000000000",
     type: "uniqueidentifier",
+    nullable: true,
   })
   birthProvinceId: string;
 
   @Column({
     length: 40,
+    nullable: true,
   })
   birthProvince: string;
 
-  @Column()
+  @Column({nullable: true,})
   noOfChildren: number;
 
   @Column({
@@ -124,12 +130,14 @@ export class KycSearchCitizen extends Base {
 
   @Column({
     default: false,
+    nullable: true,
   }
   )
   isPwd: boolean;
 
   @Column({
     default: false,
+    nullable: true,
   }
   )
   isDependent: boolean; 
@@ -174,27 +182,32 @@ export class KycSearchCitizen extends Base {
   @Column({
     default: "00000000-0000-0000-0000-000000000000",
     type: "uniqueidentifier",
+    nullable: true,
   })  
   presentCityId: string;
 
   @Column({
     length: 100,
+    nullable: true,
   })
   presentCity: string;
 
   @Column({
     default: "00000000-0000-0000-0000-000000000000",
     type: "uniqueidentifier",
+    nullable: true,
   })  
   presentProvinceId: string;
 
   @Column({
     length: 100,
+    nullable: true,
   })
   presentProvince: string;  
 
   @Column({
     length: 6,
+    nullable: true,
   })
   presentPostal: string;
 
