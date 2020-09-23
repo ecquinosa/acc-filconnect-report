@@ -23,12 +23,13 @@ async function Main() {
   const port = configuration.get("server.port");
   const appname = configuration.get("spring.application.name");
   
-  app.listen(port, (err) => {
-    if (err) {
-      Logger.error(err);
-      process.exit(1);
-      return;
-    }
+  //app.listen(port, (err) => {
+  app.listen(port, () => {
+    // if (err) {
+    //   Logger.error(err);
+    //   process.exit(1);
+    //   return;
+    //}
     Logger.info(`
       ######################################################################
       🛡️  ${appname} service listening on port: ${port} 🛡️ 
