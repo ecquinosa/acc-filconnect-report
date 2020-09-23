@@ -32,9 +32,10 @@ export default class KycService implements IKycService {
     const conn = getConnection();
     var memberRepository = await conn.getRepository(KycSearchCitizen);
 
-    var record = await memberRepository.createQueryBuilder("KycSearchCitizen")
-      .innerJoin("KycSearchCitizen.member", "member")
-      .where("member.uuid = :memberId", { memberId: entity.memberId })
+    var record = await memberRepository.createQueryBuilder("KycSearchCitizen")      
+      .where("firstName = :firstName", { firstName: entity.firstName })
+      .andWhere("middleName = :middleName", { middleName: entity.middleName })
+      .andWhere("lastName = :lastName", { lastName: entity.lastName })
       .getOne();
 
     if (!record) {
