@@ -21,6 +21,12 @@ export default async function () {
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.KYC_UPDATE_AGE_CITIZEN, await kycUpdateAgeCitizen); 
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.GET_FILE, await getFile); 
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
+
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await getSummaryPerBrgy); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await get); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
 }
 
 async function kycCreateCitizen({ task, taskService }) {
@@ -257,4 +263,31 @@ async function setTypedVariable(variables: Variables, responsePayload) {
       serializationDataFormat: "application/json",
     },
   });
+}
+
+async function getSummaryPerBrgy({ task, taskService }) {
+  const variables = new Variables();    
+  let resultService: IResult = null;
+
+  try {
+    const taskVariables = await camundaService.GetVariables(task);
+
+    // get payload and response value.
+    const payload = taskVariables.payloadVariable.payload;
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;        
+
+    resultService = await kycService.GetSummaryPerBrgy(payload);
+    
+    setTypedVariable(variables, resultService.value);    
+  } catch (error) {
+    console.log(error);
+    resultService = utilResponsePayloadSystemError(error);    
+    setTypedVariable(variables, resultService.value);
+  }  
+
+  log.info("🔥 kycCreateCitizen result : %o", JSON.stringify(resultService.value));
+
+  variables.set("status", resultService.status);
+
+  taskService.complete(task, variables);
 }

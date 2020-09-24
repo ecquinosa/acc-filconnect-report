@@ -158,5 +158,65 @@ export default (app: Router) => {
     //logger.info(result);
     return res.json({ response: result }).status(200);
   });
+
+  route.post(ROUTE.REPORT.GET_SUMMARY_PER_BRGY, async (req: Request, res: Response, next: NextFunction) => {
+    const entity = JSON.parse(JSON.stringify(req.body));       
+    
+    const result = await camundService.Start(
+      JSON.stringify(req.body),
+      JSON.stringify(req.headers),
+      ORCHESTRATION.PROCESS_DEFINITION.REPORT.GET_SUMMARY_PER_BRGY
+    );    
+    
+    return res.json({ response: result }).status(200);
+  });
+
+  route.post(ROUTE.REPORT.GET_SUMMARY_PER_AGE, async (req: Request, res: Response, next: NextFunction) => {
+    const entity = JSON.parse(JSON.stringify(req.body));       
+    
+    const result = await camundService.Start(
+      JSON.stringify(req.body),
+      JSON.stringify(req.headers),
+      ORCHESTRATION.PROCESS_DEFINITION.REPORT.GET_SUMMARY_PER_AGE
+    );    
+    
+    return res.json({ response: result }).status(200);
+  });
+
+  route.post(ROUTE.REPORT.GET_SUMMARY_PER_AGE_BRACKET, async (req: Request, res: Response, next: NextFunction) => {
+    const entity = JSON.parse(JSON.stringify(req.body));       
+    
+    const result = await camundService.Start(
+      JSON.stringify(req.body),
+      JSON.stringify(req.headers),
+      ORCHESTRATION.PROCESS_DEFINITION.REPORT.GET_SUMMARY_PER_AGE_BRACKET
+    );    
+    
+    return res.json({ response: result }).status(200);
+  });
+
+  route.post(ROUTE.REPORT.GET_SUMMARY_PER_EMPLOYMENT_STATUS, async (req: Request, res: Response, next: NextFunction) => {
+    const entity = JSON.parse(JSON.stringify(req.body));       
+    
+    const result = await camundService.Start(
+      JSON.stringify(req.body),
+      JSON.stringify(req.headers),
+      ORCHESTRATION.PROCESS_DEFINITION.REPORT.GET_SUMMARY_PER_EMPLOYMENT_STATUS
+    );    
+    
+    return res.json({ response: result }).status(200);
+  });
+
+  route.post(ROUTE.REPORT.GET_SUMMARY_SENIORCITIZEN_PER_BRGY, async (req: Request, res: Response, next: NextFunction) => {
+    const entity = JSON.parse(JSON.stringify(req.body));       
+    
+    const result = await camundService.Start(
+      JSON.stringify(req.body),
+      JSON.stringify(req.headers),
+      ORCHESTRATION.PROCESS_DEFINITION.REPORT.GET_SUMMARY_SENIORCITIZEN_PER_BRGY
+    );    
+    
+    return res.json({ response: result }).status(200);
+  });
  
 };

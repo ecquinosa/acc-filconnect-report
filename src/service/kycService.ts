@@ -693,4 +693,110 @@ export default class KycService implements IKycService {
     return await utilResponsePayloadSuccess(responses, 0, 0);
   }
 
+  public async GetSummaryPerBrgy(entity) {
+    const conn = getConnection();
+    var entRepository = await conn.getRepository(KycSearchCitizen);
+
+    var query = "SELECT presentBarangay ,COUNT(presentBarangay) as count from KycSearchCitizen  "
+
+    query = query.concat(" WHERE is_reversed=0 ")
+    query = query.concat(" AND institutionId = '", entity.payload.institutionId, "' ");
+    query = query.concat(" AND presentCity = '", entity.payload.presentCity, "' ");
+    query = query.concat(" AND presentProvince = '", entity.payload.presentProvince, "' ");    
+    query = query.concat(" group by presentBarangay ")
+
+
+    if (entity.pagination.count > 0) {
+      query = query.concat("  ORDER BY ma.presentBarangay ASC ")
+      query = query.concat(" OFFSET ", (entity.pagination.page * entity.pagination.count).toString(), " ROWS ")
+      query = query.concat(" FETCH NEXT ", (entity.pagination.count).toString(), " ROWS ONLY ")
+    }
+
+    return await entRepository.query(query);
+  }
+
+  public async GetSummaryPerAgeBracket(entity) {
+    const conn = getConnection();
+    var entRepository = await conn.getRepository(KycSearchCitizen);
+
+    var query = "SELECT gender,age,COUNT(AGE) as [count] FROM KycSearchCitizen "    
+
+    query = query.concat(" WHERE is_reversed=0 ")
+    query = query.concat(" AND institutionId = '", entity.payload.institutionId, "' ");
+    query = query.concat(" AND presentCity = '", entity.payload.presentCity, "' ");
+    query = query.concat(" AND presentProvince = '", entity.payload.presentProvince, "' ");    
+    query = query.concat(" GROUP BY GENDER,AGE ")
+
+    if (entity.pagination.count > 0) {
+      query = query.concat("  ORDER BY gender ASC ")
+      query = query.concat(" OFFSET ", (entity.pagination.page * entity.pagination.count).toString(), " ROWS ")
+      query = query.concat(" FETCH NEXT ", (entity.pagination.count).toString(), " ROWS ONLY ")
+    }
+
+    return await entRepository.query(query);
+  }
+
+  public async GetSummaryPerAge(entity) {
+    const conn = getConnection();
+    var entRepository = await conn.getRepository(KycSearchCitizen);
+
+    var query = "SELECT gender, age, COUNT(age) as [count] FROM KycSearchCitizen "
+
+    query = query.concat(" WHERE is_reversed=0 ")
+    query = query.concat(" AND institutionId = '", entity.payload.institutionId, "' ");
+    query = query.concat(" AND presentCity = '", entity.payload.presentCity, "' ");
+    query = query.concat(" AND presentProvince = '", entity.payload.presentProvince, "' ");    
+    query = query.concat(" GROUP BY GENDER,AGE ")
+
+    if (entity.pagination.count > 0) {
+      query = query.concat("  ORDER BY gender ASC ")
+      query = query.concat(" OFFSET ", (entity.pagination.page * entity.pagination.count).toString(), " ROWS ")
+      query = query.concat(" FETCH NEXT ", (entity.pagination.count).toString(), " ROWS ONLY ")
+    }
+
+    return await entRepository.query(query);
+  }
+
+  public async GetSummaryPerEmploymentStatus(entity) {
+    const conn = getConnection();
+    var entRepository = await conn.getRepository(KycSearchCitizen);
+
+    var query = "SELECT employmentStatus, count(employmentStatus) as [count] from KycSearchCitizen "
+
+    query = query.concat(" WHERE is_reversed=0 ")
+    query = query.concat(" AND institutionId = '", entity.payload.institutionId, "' ");
+    query = query.concat(" AND presentCity = '", entity.payload.presentCity, "' ");
+    query = query.concat(" AND presentProvince = '", entity.payload.presentProvince, "' ");    
+    query = query.concat(" GROUP BY employmentStatus ")
+
+    if (entity.pagination.count > 0) {
+      query = query.concat("  ORDER BY employmentStatus ASC ")
+      query = query.concat(" OFFSET ", (entity.pagination.page * entity.pagination.count).toString(), " ROWS ")
+      query = query.concat(" FETCH NEXT ", (entity.pagination.count).toString(), " ROWS ONLY ")
+    }
+
+    return await entRepository.query(query);
+  }
+
+  public async GetSummarySeniorCitizenPerBrgy(entity) {
+    const conn = getConnection();
+    var entRepository = await conn.getRepository(KycSearchCitizen);
+
+    var query = "SELECT presentBarangay, COUNT(birthDate) as [count] FROM KycSearchCitizen "
+    
+    query = query.concat(" WHERE is_reversed=0 ")
+    query = query.concat(" AND institutionId = '", entity.payload.institutionId, "' ");
+    query = query.concat(" AND presentCity = '", entity.payload.presentCity, "' ");
+    query = query.concat(" AND presentProvince = '", entity.payload.presentProvince, "' ");    
+    query = query.concat(" AND age >= 60 GROUP BY presentBarangay ")
+
+    if (entity.pagination.count > 0) {
+      query = query.concat("  ORDER BY presentBarangay ASC ")
+      query = query.concat(" OFFSET ", (entity.pagination.page * entity.pagination.count).toString(), " ROWS ")
+      query = query.concat(" FETCH NEXT ", (entity.pagination.count).toString(), " ROWS ONLY ")
+    }
+
+    return await entRepository.query(query);
+  }
+
 }

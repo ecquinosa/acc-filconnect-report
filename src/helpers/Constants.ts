@@ -19,6 +19,11 @@ export const ROUTE = {
     GET_FILE: "/getFile",
     DELETE_FILE: "/deleteFile",
     LIST_FILE: "/listFiles",
+    GET_SUMMARY_PER_BRGY: "/getSummaryPerBrgy",
+    GET_SUMMARY_PER_AGE: "/getSummaryPerAge",
+    GET_SUMMARY_PER_AGE_BRACKET: "/getSummaryPerAgeBracket",
+    GET_SUMMARY_PER_EMPLOYMENT_STATUS: "/getSummaryPerEmploymentStatus",
+    GET_SUMMARY_SENIORCITIZEN_PER_BRGY: "/getSummarySeniorCitizenPerBrgy",
   },
 };
 
@@ -34,6 +39,11 @@ export const ORCHESTRATION = {
       GET_FILE: "reportGetFile",
       DELETE_FILE: "reportDeleteFile",
       LIST_FILE: "reportListFiles",
+      GET_SUMMARY_PER_BRGY: "kycGetSummaryPerBrgy",
+      GET_SUMMARY_PER_AGE: "kycGetSummaryPerAge",
+      GET_SUMMARY_PER_AGE_BRACKET: "kycGetSummaryPerAgeBracket",
+      GET_SUMMARY_PER_EMPLOYMENT_STATUS: "kycGetSummaryPerEmploymentStatus",
+      GET_SUMMARY_SENIORCITIZEN_PER_BRGY: "kycGetSummarySeniorCitizenPerBrgy",
     },
   },
   PROCESS_DEFINITION: {
@@ -46,7 +56,12 @@ export const ORCHESTRATION = {
       KYC_UPDATE_AGE_CITIZEN: "reportKycUpdateAgeCitizen",
       GET_FILE: "reportGetFile",
       DELETE_FILE: "reportDeleteFile",
-      LIST_FILE: "reportListFiles"
+      LIST_FILE: "reportListFiles",
+      GET_SUMMARY_PER_BRGY: "kycGetSummaryPerBrgy",
+      GET_SUMMARY_PER_AGE: "kycGetSummaryPerAge",
+      GET_SUMMARY_PER_AGE_BRACKET: "kycGetSummaryPerAgeBracket",
+      GET_SUMMARY_PER_EMPLOYMENT_STATUS: "kycGetSummaryPerEmploymentStatus",
+      GET_SUMMARY_SENIORCITIZEN_PER_BRGY: "kycGetSummarySeniorCitizenPerBrgy",
     },
   },
   VARIABLE: {
