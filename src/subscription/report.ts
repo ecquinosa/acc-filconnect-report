@@ -5,6 +5,7 @@ import log from "../loaders/Logger";
 import { IKycService } from "../service/kycService";
 import { ICamundaService } from "../service/CamundaService";
 import { IResult, utilResponsePayloadSystemError, utilResponsePayloadSuccess, utilResponsePayloadSuccessNoParam } from "../helpers/Utility";
+import LoggerInstance from "../loaders/Logger";
 
 let camundaService: ICamundaService;
 let kycService: IKycService;
@@ -22,11 +23,11 @@ export default async function () {
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.GET_FILE, await getFile); 
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
 
-  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await getSummaryPerBrgy); 
-  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await get); 
-  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
-  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
-  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.GET_SUMMARY_PER_BRGY, await getSummaryPerBrgy); 
+  // camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await get); 
+  // camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
+  // camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
+  // camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
 }
 
 async function kycCreateCitizen({ task, taskService }) {
@@ -150,7 +151,7 @@ async function kycUpdateAgeCitizen({ task, taskService }) {
     const payload = taskVariables.payloadVariable.payload;
     const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;        
 
-    resultService = await kycService.updateAge();
+    resultService = await kycService.updateAge(payload);
     
     setTypedVariable(variables, resultService.value);    
   } catch (error) {
@@ -266,26 +267,244 @@ async function setTypedVariable(variables: Variables, responsePayload) {
 }
 
 async function getSummaryPerBrgy({ task, taskService }) {
-  const variables = new Variables();    
+  const variables = new Variables();
   let resultService: IResult = null;
+  let recordCount = 0;
 
   try {
     const taskVariables = await camundaService.GetVariables(task);
 
     // get payload and response value.
     const payload = taskVariables.payloadVariable.payload;
-    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;        
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
 
-    resultService = await kycService.GetSummaryPerBrgy(payload);
-    
-    setTypedVariable(variables, resultService.value);    
+    var validationResult = await kycService.validateGetSummaryBrgy(payload.payload);
+
+    if (validationResult.length === 0) {      
+      var result = await kycService.GetSummaryPerBrgy(payload);
+      if (result) {        
+        if (payload.pagination.page == 0) {
+          if (payload.pagination.count > 0) {
+            payload.pagination.count = 0;
+            var resultCount = await kycService.GetSummaryPerBrgy(payload);
+            recordCount = resultCount.length;
+          }
+          else recordCount = result.length;
+        }
+
+        resultService = utilResponsePayloadSuccess(result, result.length, recordCount);
+        log.info("🔥 getSummaryPerBrgy success result : %o", JSON.stringify(resultService.value));        
+      } else {
+        resultService = utilResponsePayloadSystemError("Failed to get summary");
+        log.error("🔥 getSummaryPerBrgy success result : %o", JSON.stringify(resultService.value));        
+      }
+    } else {
+      resultService = utilResponsePayloadSystemError("Invalid payload");
+      log.error("🔥 getSummaryPerBrgy success result : %o", JSON.stringify(resultService.value));      
+    }
   } catch (error) {
     console.log(error);
     resultService = utilResponsePayloadSystemError(error);    
-    setTypedVariable(variables, resultService.value);
-  }  
+    log.error("🔥 getSummaryPerBrgy success result : %o", JSON.stringify(resultService.value));      
+  }
 
-  log.info("🔥 kycCreateCitizen result : %o", JSON.stringify(resultService.value));
+  setTypedVariable(variables, resultService.value);  
+
+  variables.set("status", resultService.status);
+
+  taskService.complete(task, variables);
+}
+
+async function getSummaryPerAgeBracket({ task, taskService }) {
+  const variables = new Variables();
+  let resultService: IResult = null;
+  let recordCount = 0;
+
+  try {
+    const taskVariables = await camundaService.GetVariables(task);
+
+    // get payload and response value.
+    const payload = taskVariables.payloadVariable.payload;
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
+
+    var validationResult = await kycService.validateGetSummaryBrgy(payload.payload);
+
+    if (validationResult.length === 0) {      
+      var result = await kycService.GetSummaryPerAgeBracket(payload);
+      if (result) {        
+        if (payload.pagination.page == 0) {
+          if (payload.pagination.count > 0) {
+            payload.pagination.count = 0;
+            var resultCount = await kycService.GetSummaryPerAgeBracket(payload);
+            recordCount = resultCount.length;
+          }
+          else recordCount = result.length;
+        }
+
+        resultService = utilResponsePayloadSuccess(result, result.length, recordCount);
+        log.info("🔥 getSummaryPerAgeBracket success result : %o", JSON.stringify(resultService.value));        
+      } else {
+        resultService = utilResponsePayloadSystemError("Failed to get summary");
+        log.error("🔥 getSummaryPerAgeBracket success result : %o", JSON.stringify(resultService.value));        
+      }
+    } else {
+      resultService = utilResponsePayloadSystemError("Invalid payload");
+      log.error("🔥 getSummaryPerAgeBracket success result : %o", JSON.stringify(resultService.value));      
+    }
+  } catch (error) {
+    console.log(error);
+    resultService = utilResponsePayloadSystemError(error);    
+    log.error("🔥 getSummaryPerAgeBracket success result : %o", JSON.stringify(resultService.value));      
+  }
+
+  setTypedVariable(variables, resultService.value);  
+
+  variables.set("status", resultService.status);
+
+  taskService.complete(task, variables);
+}
+
+async function getSummaryPerAge({ task, taskService }) {
+  const variables = new Variables();
+  let resultService: IResult = null;
+  let recordCount = 0;
+
+  try {
+    const taskVariables = await camundaService.GetVariables(task);
+
+    // get payload and response value.
+    const payload = taskVariables.payloadVariable.payload;
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
+
+    var validationResult = await kycService.validateGetSummaryBrgy(payload.payload);
+
+    if (validationResult.length === 0) {      
+      var result = await kycService.GetSummaryPerAge(payload);
+      if (result) {        
+        if (payload.pagination.page == 0) {
+          if (payload.pagination.count > 0) {
+            payload.pagination.count = 0;
+            var resultCount = await kycService.GetSummaryPerAge(payload);
+            recordCount = resultCount.length;
+          }
+          else recordCount = result.length;
+        }
+
+        resultService = utilResponsePayloadSuccess(result, result.length, recordCount);
+        log.info("🔥 getSummaryPerAge success result : %o", JSON.stringify(resultService.value));        
+      } else {
+        resultService = utilResponsePayloadSystemError("Failed to get summary");
+        log.error("🔥 getSummaryPerAge success result : %o", JSON.stringify(resultService.value));        
+      }
+    } else {
+      resultService = utilResponsePayloadSystemError("Invalid payload");
+      log.error("🔥 getSummaryPerAge success result : %o", JSON.stringify(resultService.value));      
+    }
+  } catch (error) {
+    console.log(error);
+    resultService = utilResponsePayloadSystemError(error);    
+    log.error("🔥 getSummaryPerAge success result : %o", JSON.stringify(resultService.value));      
+  }
+
+  setTypedVariable(variables, resultService.value);  
+
+  variables.set("status", resultService.status);
+
+  taskService.complete(task, variables);
+}
+
+async function getSummaryPerEmploymentStatus({ task, taskService }) {
+  const variables = new Variables();
+  let resultService: IResult = null;
+  let recordCount = 0;
+
+  try {
+    const taskVariables = await camundaService.GetVariables(task);
+
+    // get payload and response value.
+    const payload = taskVariables.payloadVariable.payload;
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
+
+    var validationResult = await kycService.validateGetSummaryBrgy(payload.payload);
+
+    if (validationResult.length === 0) {      
+      var result = await kycService.GetSummaryPerEmploymentStatus(payload);
+      if (result) {        
+        if (payload.pagination.page == 0) {
+          if (payload.pagination.count > 0) {
+            payload.pagination.count = 0;
+            var resultCount = await kycService.GetSummaryPerEmploymentStatus(payload);
+            recordCount = resultCount.length;
+          }
+          else recordCount = result.length;
+        }
+
+        resultService = utilResponsePayloadSuccess(result, result.length, recordCount);
+        log.info("🔥 getSummaryPerEmploymentStatus success result : %o", JSON.stringify(resultService.value));        
+      } else {
+        resultService = utilResponsePayloadSystemError("Failed to get summary");
+        log.error("🔥 getSummaryPerEmploymentStatus success result : %o", JSON.stringify(resultService.value));        
+      }
+    } else {
+      resultService = utilResponsePayloadSystemError("Invalid payload");
+      log.error("🔥 getSummaryPerEmploymentStatus success result : %o", JSON.stringify(resultService.value));      
+    }
+  } catch (error) {
+    console.log(error);
+    resultService = utilResponsePayloadSystemError(error);    
+    log.error("🔥 getSummaryPerEmploymentStatus success result : %o", JSON.stringify(resultService.value));      
+  }
+
+  setTypedVariable(variables, resultService.value);  
+
+  variables.set("status", resultService.status);
+
+  taskService.complete(task, variables);
+}
+
+async function getSummarySeniorCitizenPerBrgy({ task, taskService }) {
+  const variables = new Variables();
+  let resultService: IResult = null;
+  let recordCount = 0;
+
+  try {
+    const taskVariables = await camundaService.GetVariables(task);
+
+    // get payload and response value.
+    const payload = taskVariables.payloadVariable.payload;
+    const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
+
+    var validationResult = await kycService.validateGetSummaryBrgy(payload.payload);
+
+    if (validationResult.length === 0) {      
+      var result = await kycService.GetSummarySeniorCitizenPerBrgy(payload);
+      if (result) {        
+        if (payload.pagination.page == 0) {
+          if (payload.pagination.count > 0) {
+            payload.pagination.count = 0;
+            var resultCount = await kycService.GetSummarySeniorCitizenPerBrgy(payload);
+            recordCount = resultCount.length;
+          }
+          else recordCount = result.length;
+        }
+
+        resultService = utilResponsePayloadSuccess(result, result.length, recordCount);
+        log.info("🔥 getSummarySeniorCitizenPerBrgy success result : %o", JSON.stringify(resultService.value));        
+      } else {
+        resultService = utilResponsePayloadSystemError("Failed to get summary");
+        log.error("🔥 getSummarySeniorCitizenPerBrgy success result : %o", JSON.stringify(resultService.value));        
+      }
+    } else {
+      resultService = utilResponsePayloadSystemError("Invalid payload");
+      log.error("🔥 getSummarySeniorCitizenPerBrgy success result : %o", JSON.stringify(resultService.value));      
+    }
+  } catch (error) {
+    console.log(error);
+    resultService = utilResponsePayloadSystemError(error);    
+    log.error("🔥 getSummarySeniorCitizenPerBrgy success result : %o", JSON.stringify(resultService.value));      
+  }
+
+  setTypedVariable(variables, resultService.value);  
 
   variables.set("status", resultService.status);
 

@@ -9,6 +9,8 @@ import ExcelService, { IExcelService } from "./excelService";
 import PDFService, { IPDFService } from "./pdfService";
 import fileService from "./fileService";
 import { uploadFile, randomIntFromInterval } from "../helpers/Utility";
+import { memberGetSummaryPerBrgyVM } from "../viewmodel/report/memberGetSummaryPerBrgyVM";
+
 
 import fs, { unlink } from 'fs';
 
@@ -17,13 +19,19 @@ export interface IKycService {
   update(payload): Promise<IResult>;
   updateAddress(payload): Promise<IResult>;
   updateContactInfo(payload): Promise<IResult>;
-  updateAge(): Promise<IResult>;  
+  updateAge(payload): Promise<IResult>;  
   SearchCitizen(payload): Promise<IResult>;
   SearchCitizenv2(payload): Promise<IResult>;
   getFilev1(payload): Promise<IResult>;
   getFilev2(payload): Promise<IResult>;
   deleteFilev1(payload): Promise<IResult>;
   deleteFilev2(payload): Promise<IResult>;
+  validateGetSummaryBrgy(payload): Promise<ValidationError[]>;
+  GetSummaryPerBrgy(payload);
+  GetSummaryPerAgeBracket(payload);
+  GetSummaryPerAge(payload);
+  GetSummaryPerEmploymentStatus(payload);
+  GetSummarySeniorCitizenPerBrgy(payload);
 }
 
 // Service layer where to put all the business logic computation % etc.
@@ -132,12 +140,12 @@ export default class KycService implements IKycService {
     query = query.concat(" middleName = '", payload.middleName, "',");
     query = query.concat(" suffix = '", payload.suffix, "',");
     query = query.concat(" gender = '", payload.gender, "',");
-    query = query.concat(" age = CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETD ATE())/365.25 AS int),");
+    query = query.concat(" age = CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int), ");
     query = query.concat(" ageBracket = case \
     when CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int)<=18 THEN '0-18' \
     WHEN CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int) BETWEEN 19 AND 40 THEN '19-40' \
     WHEN CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int) BETWEEN 41 AND 60 THEN '41-60' \
-    ELSE '60+' END,");
+    ELSE '60+' END, ");
     query = query.concat(" birthDate = '", dob.toISOString().slice(0, 10), "',");
     query = query.concat(" birthDay = '", (await this.getBirthDayFormat(dob)).toString(), "',");
 
@@ -158,13 +166,13 @@ export default class KycService implements IKycService {
 
     query = query.concat(" WHERE uuid = '", payload.memberId, "' ");
 
-    var updateResult = await entityRepository.query(query);
+    var updateResult = entityRepository.query(query);
 
     if (updateResult) return utilResponsePayloadSuccess(updateResult, 0, 0);
     else return utilResponsePayloadSystemError("Failed to update report update");
   }
 
-  public async updateAge(): Promise<IResult> {
+  public async updateAge(payload): Promise<IResult> {
 
     const conn = getConnection();
     var entityRepository = await conn.getRepository(KycSearchCitizen);
@@ -176,21 +184,22 @@ export default class KycService implements IKycService {
 
     var query = "update KycSearchCitizen set "
     
-    query = query.concat(" age = CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETD ATE())/365.25 AS int),");
+    query = query.concat(" age = CAST(DATEDIFF(dy,  birthDate, GETDATE())/365.25 AS int), ");
     query = query.concat(" ageBracket = case \
-    when CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int)<=18 THEN '0-18' \
-    WHEN CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int) BETWEEN 19 AND 40 THEN '19-40' \
-    WHEN CAST(DATEDIFF(dy,  '", dob.toISOString().slice(0, 10), "', GETDATE())/365.25 AS int) BETWEEN 41 AND 60 THEN '41-60' \
-    ELSE '60+' END,");
+    when CAST(DATEDIFF(dy,  birthDate, GETDATE())/365.25 AS int)<=18 THEN '0-18' \
+    WHEN CAST(DATEDIFF(dy,  birthDate, GETDATE())/365.25 AS int) BETWEEN 19 AND 40 THEN '19-40' \
+    WHEN CAST(DATEDIFF(dy,  birthDate, GETDATE())/365.25 AS int) BETWEEN 41 AND 60 THEN '41-60' \
+    ELSE '60+' END, ");
 
     query = query.concat(" updated = GETDATE() ");
 
     query = query.concat(" WHERE birthDay = '", (await this.getBirthDayFormat(dob)).toString(), "' ");
-
-    var updateResult = await entityRepository.query(query);
+    query = query.concat(" AND institutionId = '", payload.institutionId, "' ");
+    
+    var updateResult = entityRepository.query(query);
 
     if (updateResult) return utilResponsePayloadSuccess(updateResult, 0, 0);
-    else return utilResponsePayloadSystemError("Failed to update report update");
+    else return utilResponsePayloadSystemError("Failed to update citizen age");
   }
 
   public async updateAddress(payload): Promise<IResult> {
@@ -215,7 +224,7 @@ export default class KycService implements IKycService {
 
     query = query.concat(" WHERE uuid = '", payload.memberId, "' ");
 
-    var updateResult = await entityRepository.query(query);
+    var updateResult = entityRepository.query(query);
 
     if (updateResult) return utilResponsePayloadSuccess(updateResult, 0, 0);
     else return utilResponsePayloadSystemError("Failed to update report updateAddress");
@@ -247,7 +256,7 @@ export default class KycService implements IKycService {
 
     query = query.concat(" WHERE uuid = '", payload.memberId, "' ");
 
-    var updateResult = await entityRepository.query(query);
+    var updateResult = entityRepository.query(query);
 
     if (updateResult) return utilResponsePayloadSuccess(updateResult, 0, 0);
     else return utilResponsePayloadSystemError("Failed to update report updateContactInfo");
@@ -400,6 +409,14 @@ export default class KycService implements IKycService {
 
     if (payload.presentProvince != "" && payload.presentProvince != undefined) {
       query = query.concat(" AND presentProvince like '%", payload.presentProvince, "%' ");
+    }
+
+    if (payload.incomeFrom != "" && payload.incomeFrom != null && payload.incomeFrom != undefined) {
+      query = query.concat(" AND monthlyIncome >= ", payload.incomeFrom, " ");
+    }
+
+    if (payload.incomeTo != "" && payload.incomeTo != null && payload.incomeTo != undefined) {
+      query = query.concat(" AND monthlyIncome <= ", payload.incomeTo, " ");
     }
 
     if (
@@ -585,6 +602,14 @@ export default class KycService implements IKycService {
       query = query.concat(" AND presentProvince like '%", payload.presentProvince, "%' ");
     }
 
+    if (payload.incomeFrom != "" && payload.incomeFrom != null && payload.incomeFrom != undefined) {
+      query = query.concat(" AND monthlyIncome >= ", payload.incomeFrom, " ");
+    }
+
+    if (payload.incomeTo != "" && payload.incomeTo != null && payload.incomeTo != undefined) {
+      query = query.concat(" AND monthlyIncome <= ", payload.incomeTo, " ");
+    }
+
     if (
       payload.birthDateFrom != "" &&
       payload.birthDateFrom != undefined &&
@@ -697,20 +722,20 @@ export default class KycService implements IKycService {
     const conn = getConnection();
     var entRepository = await conn.getRepository(KycSearchCitizen);
 
-    var query = "SELECT presentBarangay ,COUNT(presentBarangay) as count from KycSearchCitizen  "
+    var query = "SELECT presentBarangay, COUNT(presentBarangay) as count from KycSearchCitizen  "
 
     query = query.concat(" WHERE is_reversed=0 ")
     query = query.concat(" AND institutionId = '", entity.payload.institutionId, "' ");
-    query = query.concat(" AND presentCity = '", entity.payload.presentCity, "' ");
-    query = query.concat(" AND presentProvince = '", entity.payload.presentProvince, "' ");    
+    query = query.concat(" AND presentCity = '", entity.payload.city, "' ");
+    query = query.concat(" AND presentProvince = '", entity.payload.province, "' ");    
     query = query.concat(" group by presentBarangay ")
 
 
     if (entity.pagination.count > 0) {
-      query = query.concat("  ORDER BY ma.presentBarangay ASC ")
+      query = query.concat("  ORDER BY presentBarangay ASC ")
       query = query.concat(" OFFSET ", (entity.pagination.page * entity.pagination.count).toString(), " ROWS ")
       query = query.concat(" FETCH NEXT ", (entity.pagination.count).toString(), " ROWS ONLY ")
-    }
+    }        
 
     return await entRepository.query(query);
   }
@@ -723,8 +748,8 @@ export default class KycService implements IKycService {
 
     query = query.concat(" WHERE is_reversed=0 ")
     query = query.concat(" AND institutionId = '", entity.payload.institutionId, "' ");
-    query = query.concat(" AND presentCity = '", entity.payload.presentCity, "' ");
-    query = query.concat(" AND presentProvince = '", entity.payload.presentProvince, "' ");    
+    query = query.concat(" AND presentCity = '", entity.payload.city, "' ");
+    query = query.concat(" AND presentProvince = '", entity.payload.province, "' ");    
     query = query.concat(" GROUP BY GENDER,AGE ")
 
     if (entity.pagination.count > 0) {
@@ -744,8 +769,8 @@ export default class KycService implements IKycService {
 
     query = query.concat(" WHERE is_reversed=0 ")
     query = query.concat(" AND institutionId = '", entity.payload.institutionId, "' ");
-    query = query.concat(" AND presentCity = '", entity.payload.presentCity, "' ");
-    query = query.concat(" AND presentProvince = '", entity.payload.presentProvince, "' ");    
+    query = query.concat(" AND presentCity = '", entity.payload.city, "' ");
+    query = query.concat(" AND presentProvince = '", entity.payload.province, "' ");    
     query = query.concat(" GROUP BY GENDER,AGE ")
 
     if (entity.pagination.count > 0) {
@@ -765,8 +790,8 @@ export default class KycService implements IKycService {
 
     query = query.concat(" WHERE is_reversed=0 ")
     query = query.concat(" AND institutionId = '", entity.payload.institutionId, "' ");
-    query = query.concat(" AND presentCity = '", entity.payload.presentCity, "' ");
-    query = query.concat(" AND presentProvince = '", entity.payload.presentProvince, "' ");    
+    query = query.concat(" AND presentCity = '", entity.payload.city, "' ");
+    query = query.concat(" AND presentProvince = '", entity.payload.province, "' ");        
     query = query.concat(" GROUP BY employmentStatus ")
 
     if (entity.pagination.count > 0) {
@@ -786,8 +811,8 @@ export default class KycService implements IKycService {
     
     query = query.concat(" WHERE is_reversed=0 ")
     query = query.concat(" AND institutionId = '", entity.payload.institutionId, "' ");
-    query = query.concat(" AND presentCity = '", entity.payload.presentCity, "' ");
-    query = query.concat(" AND presentProvince = '", entity.payload.presentProvince, "' ");    
+    query = query.concat(" AND presentCity = '", entity.payload.city, "' ");
+    query = query.concat(" AND presentProvince = '", entity.payload.province, "' ");    
     query = query.concat(" AND age >= 60 GROUP BY presentBarangay ")
 
     if (entity.pagination.count > 0) {
@@ -797,6 +822,16 @@ export default class KycService implements IKycService {
     }
 
     return await entRepository.query(query);
+  }
+
+  public async validateGetSummaryBrgy(entity) {
+    let memberGetSummaryPerBrgy = new memberGetSummaryPerBrgyVM();
+
+    memberGetSummaryPerBrgy.institutionId = entity.institutionId;
+    memberGetSummaryPerBrgy.city = entity.city;
+    memberGetSummaryPerBrgy.province = entity.province;
+
+    return await validate(memberGetSummaryPerBrgy);
   }
 
 }

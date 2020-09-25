@@ -98,7 +98,7 @@ export default (app: Router) => {
   route.post(ROUTE.REPORT.KYC_UPDATE_AGE_CITIZEN, async (req: Request, res: Response, next: NextFunction) => {
     const entity = JSON.parse(JSON.stringify(req.body));
 
-    //const result = await kycService.SearchCitizenv2(entity.payload);
+    //const result = await kycService.updateAge(entity.payload);
     
     const result = await camundService.Start(
       JSON.stringify(req.body),
@@ -161,6 +161,8 @@ export default (app: Router) => {
 
   route.post(ROUTE.REPORT.GET_SUMMARY_PER_BRGY, async (req: Request, res: Response, next: NextFunction) => {
     const entity = JSON.parse(JSON.stringify(req.body));       
+
+    //const result = await kycService.GetSummaryPerBrgy(entity);
     
     const result = await camundService.Start(
       JSON.stringify(req.body),
@@ -168,11 +170,15 @@ export default (app: Router) => {
       ORCHESTRATION.PROCESS_DEFINITION.REPORT.GET_SUMMARY_PER_BRGY
     );    
     
+    console.log(result);
+
     return res.json({ response: result }).status(200);
   });
 
   route.post(ROUTE.REPORT.GET_SUMMARY_PER_AGE, async (req: Request, res: Response, next: NextFunction) => {
-    const entity = JSON.parse(JSON.stringify(req.body));       
+    const entity = JSON.parse(JSON.stringify(req.body));  
+    
+    //const result = await kycService.GetSummaryPerAge(entity);
     
     const result = await camundService.Start(
       JSON.stringify(req.body),
@@ -184,7 +190,9 @@ export default (app: Router) => {
   });
 
   route.post(ROUTE.REPORT.GET_SUMMARY_PER_AGE_BRACKET, async (req: Request, res: Response, next: NextFunction) => {
-    const entity = JSON.parse(JSON.stringify(req.body));       
+    const entity = JSON.parse(JSON.stringify(req.body));
+    
+    //const result = await kycService.GetSummaryPerAgeBracket(entity);
     
     const result = await camundService.Start(
       JSON.stringify(req.body),
@@ -197,6 +205,8 @@ export default (app: Router) => {
 
   route.post(ROUTE.REPORT.GET_SUMMARY_PER_EMPLOYMENT_STATUS, async (req: Request, res: Response, next: NextFunction) => {
     const entity = JSON.parse(JSON.stringify(req.body));       
+
+    //const result = await kycService.GetSummaryPerEmploymentStatus(entity);
     
     const result = await camundService.Start(
       JSON.stringify(req.body),
@@ -209,6 +219,8 @@ export default (app: Router) => {
 
   route.post(ROUTE.REPORT.GET_SUMMARY_SENIORCITIZEN_PER_BRGY, async (req: Request, res: Response, next: NextFunction) => {
     const entity = JSON.parse(JSON.stringify(req.body));       
+
+    //const result = await kycService.GetSummarySeniorCitizenPerBrgy(entity);
     
     const result = await camundService.Start(
       JSON.stringify(req.body),

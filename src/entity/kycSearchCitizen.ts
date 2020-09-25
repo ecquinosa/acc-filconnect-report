@@ -241,4 +241,21 @@ export class KycSearchCitizen extends Base {
   })
   email: string;
 
+  @Column({
+    default: "00000000-0000-0000-0000-000000000000",
+    type: "uniqueidentifier",
+  })
+  incomeTypeId: string; 
+
+  @Column({
+    length: 50,
+    nullable: true,
+  })
+  incomeType: string; 
+
+  @Column({    
+    nullable: true,
+  })
+  monthlyIncome: number;
+
 }
