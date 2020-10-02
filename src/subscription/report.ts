@@ -24,6 +24,11 @@ export default async function () {
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
 
   camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.GET_SUMMARY_PER_BRGY, await getSummaryPerBrgy); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.GET_SUMMARY_PER_AGE_BRACKET, await getSummaryPerAgeBracket); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.GET_SUMMARY_PER_AGE, await getSummaryPerAge); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.GET_SUMMARY_PER_EMPLOYMENT_STATUS, await getSummaryPerEmploymentStatus); 
+  camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.GET_SUMMARY_SENIORCITIZEN_PER_BRGY, await getSummarySeniorCitizenPerBrgy); 
+
   // camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await get); 
   // camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
   // camundaClient.subscribe(ORCHESTRATION.TOPIC.REPORT.DELETE_FILE, await deleteFile); 
@@ -327,7 +332,7 @@ async function getSummaryPerAgeBracket({ task, taskService }) {
     const payload = taskVariables.payloadVariable;
     const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
 
-    var validationResult = await kycService.validateGetSummaryBrgy(payload.payload);
+    var validationResult = await kycService.validateGetSummaryBrgy(payload);
 
     if (validationResult.length === 0) {      
       var result = await kycService.GetSummaryPerAgeBracket(payload);
@@ -376,7 +381,7 @@ async function getSummaryPerAge({ task, taskService }) {
     const payload = taskVariables.payloadVariable;
     const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
 
-    var validationResult = await kycService.validateGetSummaryBrgy(payload.payload);
+    var validationResult = await kycService.validateGetSummaryBrgy(payload);
 
     if (validationResult.length === 0) {      
       var result = await kycService.GetSummaryPerAge(payload);
@@ -425,7 +430,7 @@ async function getSummaryPerEmploymentStatus({ task, taskService }) {
     const payload = taskVariables.payloadVariable;
     const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
 
-    var validationResult = await kycService.validateGetSummaryBrgy(payload.payload);
+    var validationResult = await kycService.validateGetSummaryBrgy(payload);
 
     if (validationResult.length === 0) {      
       var result = await kycService.GetSummaryPerEmploymentStatus(payload);
@@ -474,7 +479,7 @@ async function getSummarySeniorCitizenPerBrgy({ task, taskService }) {
     const payload = taskVariables.payloadVariable;
     const response = taskVariables.responseVariable ? taskVariables.responseVariable.response : undefined;
 
-    var validationResult = await kycService.validateGetSummaryBrgy(payload.payload);
+    var validationResult = await kycService.validateGetSummaryBrgy(payload);
 
     if (validationResult.length === 0) {      
       var result = await kycService.GetSummarySeniorCitizenPerBrgy(payload);

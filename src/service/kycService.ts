@@ -722,7 +722,7 @@ export default class KycService implements IKycService {
     const conn = getConnection();
     var entRepository = await conn.getRepository(KycSearchCitizen);
 
-    console.log(entity.payload.institutionId);
+    //console.log(entity.payload.institutionId);
 
     var query = "SELECT presentBarangay, COUNT(presentBarangay) as count from KycSearchCitizen  "
 
