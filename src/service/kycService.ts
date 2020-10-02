@@ -722,6 +722,8 @@ export default class KycService implements IKycService {
     const conn = getConnection();
     var entRepository = await conn.getRepository(KycSearchCitizen);
 
+    console.log(entity.payload.institutionId);
+
     var query = "SELECT presentBarangay, COUNT(presentBarangay) as count from KycSearchCitizen  "
 
     query = query.concat(" WHERE is_reversed=0 ")
@@ -827,9 +829,9 @@ export default class KycService implements IKycService {
   public async validateGetSummaryBrgy(entity) {
     let memberGetSummaryPerBrgy = new memberGetSummaryPerBrgyVM();
 
-    memberGetSummaryPerBrgy.institutionId = entity.institutionId;
-    memberGetSummaryPerBrgy.city = entity.city;
-    memberGetSummaryPerBrgy.province = entity.province;
+    memberGetSummaryPerBrgy.institutionId = entity.payload.institutionId;
+    memberGetSummaryPerBrgy.city = entity.payload.city;
+    memberGetSummaryPerBrgy.province = entity.payload.province;
 
     return await validate(memberGetSummaryPerBrgy);
   }

@@ -162,7 +162,7 @@ export default (app: Router) => {
   route.post(ROUTE.REPORT.GET_SUMMARY_PER_BRGY, async (req: Request, res: Response, next: NextFunction) => {
     const entity = JSON.parse(JSON.stringify(req.body));       
 
-    //const result = await kycService.GetSummaryPerBrgy(entity);
+    //const result = await kycService.GetSummaryPerBrgy(entity);    
     
     const result = await camundService.Start(
       JSON.stringify(req.body),
@@ -170,7 +170,7 @@ export default (app: Router) => {
       ORCHESTRATION.PROCESS_DEFINITION.REPORT.GET_SUMMARY_PER_BRGY
     );    
     
-    console.log(result);
+    //console.log(result);
 
     return res.json({ response: result }).status(200);
   });
