@@ -33,7 +33,7 @@
     "mysql": "^2.18.1",
     "pdfkit": "^0.11.0",
     "typedi": "^0.8.0",
-    "typeorm": "^0.2.24",
+    "typeorm": "^0.2.25",
     "winston": "^3.2.1"
   },
   "devDependencies": {
